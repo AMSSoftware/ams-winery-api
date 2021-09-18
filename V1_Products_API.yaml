@@ -1,0 +1,3455 @@
+openapi: 3.0.0
+info:
+  title: V1 AMS Winery Products API
+  description: |
+    RESTful API Access to the AMS Winery Products business object. This business object represents products/parts/skus defined by the winery.
+    <br/>
+    <h1>Version Control Scheme</h1>
+    <p>Versions will be relatively static, when breaking/logic changes occur a new version will be created.</p>
+    <hr/>
+    <h1>Revision Log</h1>
+    <ul>
+    <li>2019-01-17 - KAS - Brand new.</li>
+    <li>2019-06-03 - KAS - Making this more uniform to the pattern laid out in the other APIs. Also finishing the design.</li>
+    <li>2020-05-29 - KAS - Adding Tier, Category, Varietal, and Product Group query parameters.</li>
+    <li>2020-11-25 - TWS - Add Warehouse Development Server.</li>
+    <li>2020-11-25 - KAS - Factor out common elements into the new AMSComponents and AMSProducts domains so I can create a cloned version for the warehouse products. Remove warehouse development server since there is a unique API for the Warehouse Products API.</li>
+    <li>2021-09-14 - KAS - Clean up, re-organize a bit, and import into Stoplight Studio/ReadMe. This involves the introduction of 'model' files, rather than the 'domains' that SwaggerHub allows for.</li>
+    </ul>
+  contact:
+    name: Helpdesk API Support
+    email: apisupport@amssoftware.com
+  license:
+    name: License Required
+    url: 'http://www.amssoftware.com'
+  version: '2019-01-17'
+servers:
+  - description: Winery Development Server
+    url: 'https://thor2012-test.amscloudconnect.amssoftware.com/api'
+security:
+  - AMSBearerAuth: []
+tags:
+  - name: WineryProductsGET
+    description: Gets to the Winery products API endpoint.
+paths:
+  /winery/v1/products:
+    get:
+      operationId: getV1WineryProductsQueryResults
+      tags:
+        - WineryProductsGET
+      summary: GET product query results.
+      description: Perform a search for products defined in the AMS winery database via various query parameters.
+      parameters:
+        - name: product_description
+          in: query
+          description: A winery product has three description fields. This query parameter will use a 'contains' type search on these three fields for the provided string value.
+          required: false
+          schema:
+            type: string
+        - name: product_id
+          in: query
+          description: This query parameter allows for searching by the unique product_id. Values provided will be compared to the product_id property of the resource using a 'starts-with' comparison method. No spaces are allowed in a product_id.
+          required: false
+          schema:
+            type: string
+        - name: wholesale_active_status
+          in: query
+          description: This query parameter allows for parsing the winery products resources based on the value of the product's wholesale_active_status. Possible values are HOT ACTIVE and INACTIVE.
+          required: false
+          schema:
+            title: ActiveFlagEnum
+            x-tags:
+              - Enumerations
+            type: string
+            enum:
+              - Hot
+              - Active
+              - Inactive
+            maxLength: 8
+            example: Inactive
+        - name: dtc_active_status
+          in: query
+          description: This query parameter allows for parsing the winery products resources based on the value of the product's dtc_active_status. Possible values are HOT ACTIVE and INACTIVE.
+          required: false
+          schema:
+            title: ActiveFlagEnum
+            x-tags:
+              - Enumerations
+            type: string
+            enum:
+              - Hot
+              - Active
+              - Inactive
+            maxLength: 8
+            example: Inactive
+        - name: inventory_active_status
+          in: query
+          description: This query parameter allows for parsing the winery products resources based on the value of the product's inventory_active_status. Possible values are HOT ACTIVE and INACTIVE.
+          required: false
+          schema:
+            title: ActiveFlagEnum
+            x-tags:
+              - Enumerations
+            type: string
+            enum:
+              - Hot
+              - Active
+              - Inactive
+            maxLength: 8
+            example: Inactive
+        - name: cat_category_code
+          in: query
+          description: This query parameter allows for parsing the winery products resources based on the value of the product's category code. Possible values come from the user-defined code table with table ID CAT.
+          required: false
+          schema:
+            type: string
+        - name: pdg_product_group_code
+          in: query
+          description: This query parameter allows for parsing the winery products resources based on the value of the product's product group code code. Possible values come from the user-defined code table with table ID PDG.
+          required: false
+          schema:
+            type: string
+        - name: tir_tier_code
+          in: query
+          description: This query parameter allows for parsing the winery products resources based on the value of the product's tier code. Possible values come from the user-defined code table with table ID TIR.
+          required: false
+          schema:
+            type: string
+        - name: var_varietal_code
+          in: query
+          description: This query parameter allows for parsing the winery products resources based on the value of the product's varietal code. Possible values come from the user-defined code table with table ID VAR.
+          required: false
+          schema:
+            type: string
+        - name: pagination
+          in: query
+          description: 'Query parameter that will allow for retrieving "pages" of results from the products resource. The format of the value passed must be the following, {number1},{number2}. The first numeric value indicates the number of results per page and the second numeric value indicates the requested page of results.'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok - The query of the winery products resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              products_found:
+                                type: integer
+                                example: 1
+                              products:
+                                title: V1GETProductObject
+                                type: object
+                                properties:
+                                  alcohol_percent:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 999.999
+                                    example: 14.5
+                                  allocation_begin_date:
+                                    type: string
+                                    maxLength: 5
+                                    example: 03/19
+                                  allocation_method:
+                                    title: AllocationMethodEnum
+                                    x-tags:
+                                      - Enumerations
+                                    type: string
+                                    enum:
+                                      - No Allocation
+                                      - Annual Allocation
+                                      - Perpetual Allocation
+                                    maxLength: 40
+                                    example: Perpetual Allocation
+                                  allocation_status:
+                                    title: AllocationStatusEnum
+                                    x-tags:
+                                      - Enumeration
+                                    type: string
+                                    enum:
+                                      - Not Allocated
+                                      - Allocation Setup Mode
+                                      - Allocation Active
+                                      - Allocation Inactive
+                                    maxLength: 40
+                                    example: Allocation Active
+                                  bin_number:
+                                    type: string
+                                    maxLength: 6
+                                    example: ' '
+                                  brn_brand_code:
+                                    type: string
+                                    maxLength: 6
+                                    example: DPDCS
+                                  broker_commission_status:
+                                    title: BrokerCommissionStatusEnum
+                                    x-tags:
+                                      - Enumeration
+                                    type: string
+                                    enum:
+                                      - Allow
+                                      - Deny
+                                    maxLength: 11
+                                    example: Allow
+                                  bsz_bottle_size_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: '7'
+                                  cases_per_pallet:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 999999999
+                                    example: 56
+                                  cat_wine_category_code:
+                                    type: string
+                                    maxLength: 4
+                                    example: CSNV
+                                  component_part_shipping_switch:
+                                    type: boolean
+                                    example: true
+                                  costing_active_status:
+                                    title: ActiveFlagEnum
+                                    x-tags:
+                                      - Enumerations
+                                    type: string
+                                    enum:
+                                      - Hot
+                                      - Active
+                                      - Inactive
+                                    maxLength: 8
+                                    example: Inactive
+                                  cost_revision_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 01/23/2019
+                                  ctc_custom_text_code:
+                                    type: string
+                                    maxLength: 4
+                                    example: ' '
+                                  description:
+                                    type: string
+                                    maxLength: 60
+                                    example: 2017 Napa Valley Des Partes Drive Cabernet Sauvignon
+                                  dtc_active_status:
+                                    title: ActiveFlagEnum
+                                    x-tags:
+                                      - Enumerations
+                                    type: string
+                                    enum:
+                                      - Hot
+                                      - Active
+                                      - Inactive
+                                    maxLength: 8
+                                    example: Inactive
+                                  etp_profit_analysis_etp_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: ' '
+                                  excise_tax_payment_method:
+                                    title: ExciseTaxPaymentMethodEnum
+                                    x-tags:
+                                      - Enumeration
+                                    type: string
+                                    enum:
+                                      - Record As Cost Of Goods
+                                      - Record As Expense Upon Sale
+                                      - No Excise Tax
+                                    maxLength: 40
+                                    example: Record As Cost Of Goods
+                                  excise_tax_recognition_method:
+                                    type: string
+                                    maxLength: 40
+                                    example: Expense The Tax
+                                  federal_cola_id:
+                                    type: string
+                                    maxLength: 20
+                                    example: ' '
+                                  gga_supplier_gga_code:
+                                    type: string
+                                    maxLength: 6
+                                    example: ' '
+                                  gift_card_switch:
+                                    type: boolean
+                                    example: true
+                                  highest_price_lvl_id:
+                                    type: string
+                                    maxLength: 4
+                                    example: PRT
+                                  inu_intended_use_code:
+                                    type: string
+                                    maxLength: 6
+                                    example: NA
+                                  inventory_active_status:
+                                    title: ActiveFlagEnum
+                                    x-tags:
+                                      - Enumerations
+                                    type: string
+                                    enum:
+                                      - Hot
+                                      - Active
+                                      - Inactive
+                                    maxLength: 8
+                                    example: Inactive
+                                  last_ship_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 04/31/2019
+                                  lbl_label_code:
+                                    type: string
+                                    maxLength: 18
+                                    example: CSNVDPD
+                                  lbl_profit_analysis_label_code:
+                                    type: string
+                                    maxLength: 18
+                                    example: ' '
+                                  lot_number:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 99
+                                    example: 2
+                                  master_active_status:
+                                    title: ActiveFlagEnum
+                                    x-tags:
+                                      - Enumerations
+                                    type: string
+                                    enum:
+                                      - Hot
+                                      - Active
+                                      - Inactive
+                                    maxLength: 8
+                                    example: Inactive
+                                  on_hand_active_status:
+                                    title: ActiveFlagEnum
+                                    x-tags:
+                                      - Enumerations
+                                    type: string
+                                    enum:
+                                      - Hot
+                                      - Active
+                                      - Inactive
+                                    maxLength: 8
+                                    example: Inactive
+                                  pdg_product_group_code:
+                                    type: string
+                                    maxLength: 6
+                                    example: NORTH
+                                  pdl_product_line_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: NA
+                                  pfc_financial_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: '01'
+                                  pkg_package_code:
+                                    type: string
+                                    maxLength: 4
+                                    example: ' '
+                                  pounds_per_case:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 99999999.9
+                                    example: 34.5
+                                  po_lead_days:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 999
+                                    example: 0
+                                  product_availability_rules_exemption_status:
+                                    title: ProdAvailRuleExemptEnum
+                                    x-tags:
+                                      - Enumeration
+                                    type: string
+                                    maxLength: 20
+                                    enum:
+                                      - Not Exempt
+                                      - Exempt
+                                    example: Not Exempt
+                                  product_id:
+                                    type: string
+                                    maxLength: 20
+                                    example: 17CSNVDPD
+                                  purchasing_active_status:
+                                    title: ActiveFlagEnum
+                                    x-tags:
+                                      - Enumerations
+                                    type: string
+                                    enum:
+                                      - Hot
+                                      - Active
+                                      - Inactive
+                                    maxLength: 8
+                                    example: Inactive
+                                  quantity_discount_switch:
+                                    type: boolean
+                                    example: false
+                                  release_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 04/15/2019
+                                  reorder_point_units:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 999999999
+                                    example: 0
+                                  revision_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 02/15/2019
+                                  scc_code:
+                                    type: string
+                                    maxLength: 14
+                                    example: ' '
+                                  setup_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 01/13/2019
+                                  short_description:
+                                    type: string
+                                    maxLength: 20
+                                    example: 17 NV DPD Cab Sauv
+                                  spc_state_product_category_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: ' '
+                                  standard_description:
+                                    type: string
+                                    maxLength: 30
+                                    example: 17 NV Des Partes Drive Cab
+                                  stock_status:
+                                    title: ProductStockStatusEnum
+                                    x-tags:
+                                      - Enumeration
+                                    type: string
+                                    maxLength: 16
+                                    enum:
+                                      - Stock Part
+                                      - Nonstock Part
+                                      - Stock Package
+                                      - Nonstock Package
+                                    example: Nonstock Package
+                                  taxable_item_switch:
+                                    type: boolean
+                                    example: true
+                                  tax_alcohol_class_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: '1'
+                                  tax_pre_2017_alcohol_class_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: '2'
+                                  tir_tier_code:
+                                    type: string
+                                    maxLength: 4
+                                    example: BRW
+                                  units_adjusted:
+                                    type: integer
+                                    minimum: -999999999
+                                    maximum: 999999999
+                                    example: 35
+                                  units_per_case:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 9999
+                                    example: 12
+                                  units_per_standard_case:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 9999.99999
+                                    example: 13.1
+                                  units_produced:
+                                    type: integer
+                                    minimum: -999999999
+                                    maximum: 999999999
+                                    example: 5192
+                                  units_received:
+                                    type: integer
+                                    minimum: -999999999
+                                    maximum: 999999999
+                                    example: 0
+                                  units_returned:
+                                    type: integer
+                                    minimum: -999999999
+                                    maximum: 999999999
+                                    example: 8
+                                  units_scheduled_for_production:
+                                    type: integer
+                                    minimum: -999999999
+                                    maximum: 999999999
+                                    example: 0
+                                  units_shipped:
+                                    type: integer
+                                    minimum: -999999999
+                                    maximum: 999999999
+                                    example: 1024
+                                  units_to_reorder:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 999999999
+                                    example: 0
+                                  uom_unit_of_measure_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: BX
+                                  upc_code:
+                                    type: string
+                                    maxLength: 14
+                                    example: ' '
+                                  var_varietal_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: CS
+                                  vendor_id:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 999999
+                                    example: 0
+                                  vendor_sku:
+                                    type: string
+                                    maxLength: 20
+                                    example: ' '
+                                  wholesale_active_status:
+                                    title: ActiveFlagEnum
+                                    x-tags:
+                                      - Enumerations
+                                    type: string
+                                    enum:
+                                      - Hot
+                                      - Active
+                                      - Inactive
+                                    maxLength: 8
+                                    example: Inactive
+                                  wine_club_allocation_status:
+                                    title: WineClubAllocationStatusEnum
+                                    x-tags:
+                                      - Enumeration
+                                    type: string
+                                    maxLength: 40
+                                    enum:
+                                      - Allocation Active
+                                      - Allocation Inactive
+                                      - Not Applicable
+                                    example: Allocation Inactive
+                                  win_winery_code:
+                                    type: string
+                                    maxLength: 4
+                                    example: CS
+                                  yrs_vintage_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: '17'
+                                  location_inventories:
+                                    type: array
+                                    items:
+                                      title: V1GETLocationInventoryObject
+                                      type: object
+                                      properties:
+                                        loc_location_code:
+                                          type: string
+                                          maxLength: 2
+                                          example: BD
+                                        location_description:
+                                          type: string
+                                          maxLength: 30
+                                          example: Winery Bond
+                                        total_units_available:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 150
+                                        total_units_on_hand:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 300
+                                        total_units_reserved:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 150
+                                        units_on_hand_1_month_prior:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 450
+                                        units_on_hand_2_month_prior:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 500
+                                        units_on_wholesale_order:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 24
+                                        units_on_purchase_order:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 0
+                                        units_on_dtc_order:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 56
+                                        units_sold_dtc:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 512
+                                        units_sold_dtc_1_month_prior:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 125
+                                        units_sold_dtc_2_month_prior:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 20
+                                        units_on_dtc_future_order:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 0
+                                        units_sold_dtc_future:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 0
+                                        units_sold_dtc_future_1_month_prior:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 0
+                                        units_sold_dtc_future_2_month_prior:
+                                          type: integer
+                                          minimum: -999999999
+                                          maximum: 999999999
+                                          example: 0
+                                  product_images:
+                                    type: array
+                                    items:
+                                      title: V1GETProductImageUrlObject
+                                      type: object
+                                      properties:
+                                        image_description:
+                                          type: string
+                                          maxLength: 60
+                                          example: Part front image
+                                        image_filename:
+                                          type: string
+                                          maxLength: 30
+                                          example: PRTXYZ.JPEG
+                                        image_url:
+                                          type: string
+                                          maxLength: 512
+                                          example: 'http://azure.cloud.storage.com/some-part-image-file.JPEG'
+        '400':
+          description: The query parameters used in the query of the dtc_orders endpoint were invalid.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Query Parameters Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          potential_query_parameters:
+                            title: PotentialQueryParms
+                            type: array
+                            minItems: 1
+                            items:
+                              anyOf:
+                                - title: QueryParm1Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: FIXED_STRING_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                    parameter_notes:
+                                      type: string
+                                      example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                                - title: QueryParm2Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: STRING_SEARCH_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: String search parameter (generally contains type text search)
+                                    parameter_notes:
+                                      type: string
+                                      example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                                - title: QueryParm3Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: NUMERIC_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Numeric parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                                - title: QueryParm4Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: DATE_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Date parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+  '/winery/v1/products/{product_id}':
+    get:
+      operationId: getV1WineryProduct
+      tags:
+        - WineryProductsGET
+      summary: GET specific product resource.
+      description: Retrieve a specific product resource by product ID.
+      parameters:
+        - in: path
+          name: product_id
+          description: This parameter in the path represents the unique product_id associated with a specific product resource.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok - The get of an winery product resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          product:
+                            title: V1GETProductObject
+                            type: object
+                            properties:
+                              alcohol_percent:
+                                type: number
+                                minimum: 0
+                                maximum: 999.999
+                                example: 14.5
+                              allocation_begin_date:
+                                type: string
+                                maxLength: 5
+                                example: 03/19
+                              allocation_method:
+                                title: AllocationMethodEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - No Allocation
+                                  - Annual Allocation
+                                  - Perpetual Allocation
+                                maxLength: 40
+                                example: Perpetual Allocation
+                              allocation_status:
+                                title: AllocationStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                enum:
+                                  - Not Allocated
+                                  - Allocation Setup Mode
+                                  - Allocation Active
+                                  - Allocation Inactive
+                                maxLength: 40
+                                example: Allocation Active
+                              bin_number:
+                                type: string
+                                maxLength: 6
+                                example: ' '
+                              brn_brand_code:
+                                type: string
+                                maxLength: 6
+                                example: DPDCS
+                              broker_commission_status:
+                                title: BrokerCommissionStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                enum:
+                                  - Allow
+                                  - Deny
+                                maxLength: 11
+                                example: Allow
+                              bsz_bottle_size_code:
+                                type: string
+                                maxLength: 2
+                                example: '7'
+                              cases_per_pallet:
+                                type: integer
+                                minimum: 0
+                                maximum: 999999999
+                                example: 56
+                              cat_wine_category_code:
+                                type: string
+                                maxLength: 4
+                                example: CSNV
+                              component_part_shipping_switch:
+                                type: boolean
+                                example: true
+                              costing_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              cost_revision_date:
+                                type: string
+                                maxLength: 10
+                                example: 01/23/2019
+                              ctc_custom_text_code:
+                                type: string
+                                maxLength: 4
+                                example: ' '
+                              description:
+                                type: string
+                                maxLength: 60
+                                example: 2017 Napa Valley Des Partes Drive Cabernet Sauvignon
+                              dtc_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              etp_profit_analysis_etp_code:
+                                type: string
+                                maxLength: 2
+                                example: ' '
+                              excise_tax_payment_method:
+                                title: ExciseTaxPaymentMethodEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                enum:
+                                  - Record As Cost Of Goods
+                                  - Record As Expense Upon Sale
+                                  - No Excise Tax
+                                maxLength: 40
+                                example: Record As Cost Of Goods
+                              excise_tax_recognition_method:
+                                type: string
+                                maxLength: 40
+                                example: Expense The Tax
+                              federal_cola_id:
+                                type: string
+                                maxLength: 20
+                                example: ' '
+                              gga_supplier_gga_code:
+                                type: string
+                                maxLength: 6
+                                example: ' '
+                              gift_card_switch:
+                                type: boolean
+                                example: true
+                              highest_price_lvl_id:
+                                type: string
+                                maxLength: 4
+                                example: PRT
+                              inu_intended_use_code:
+                                type: string
+                                maxLength: 6
+                                example: NA
+                              inventory_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              last_ship_date:
+                                type: string
+                                maxLength: 10
+                                example: 04/31/2019
+                              lbl_label_code:
+                                type: string
+                                maxLength: 18
+                                example: CSNVDPD
+                              lbl_profit_analysis_label_code:
+                                type: string
+                                maxLength: 18
+                                example: ' '
+                              lot_number:
+                                type: integer
+                                minimum: 0
+                                maximum: 99
+                                example: 2
+                              master_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              on_hand_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              pdg_product_group_code:
+                                type: string
+                                maxLength: 6
+                                example: NORTH
+                              pdl_product_line_code:
+                                type: string
+                                maxLength: 2
+                                example: NA
+                              pfc_financial_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              pkg_package_code:
+                                type: string
+                                maxLength: 4
+                                example: ' '
+                              pounds_per_case:
+                                type: number
+                                minimum: 0
+                                maximum: 99999999.9
+                                example: 34.5
+                              po_lead_days:
+                                type: integer
+                                minimum: 0
+                                maximum: 999
+                                example: 0
+                              product_availability_rules_exemption_status:
+                                title: ProdAvailRuleExemptEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 20
+                                enum:
+                                  - Not Exempt
+                                  - Exempt
+                                example: Not Exempt
+                              product_id:
+                                type: string
+                                maxLength: 20
+                                example: 17CSNVDPD
+                              purchasing_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              quantity_discount_switch:
+                                type: boolean
+                                example: false
+                              release_date:
+                                type: string
+                                maxLength: 10
+                                example: 04/15/2019
+                              reorder_point_units:
+                                type: integer
+                                minimum: 0
+                                maximum: 999999999
+                                example: 0
+                              revision_date:
+                                type: string
+                                maxLength: 10
+                                example: 02/15/2019
+                              scc_code:
+                                type: string
+                                maxLength: 14
+                                example: ' '
+                              setup_date:
+                                type: string
+                                maxLength: 10
+                                example: 01/13/2019
+                              short_description:
+                                type: string
+                                maxLength: 20
+                                example: 17 NV DPD Cab Sauv
+                              spc_state_product_category_code:
+                                type: string
+                                maxLength: 2
+                                example: ' '
+                              standard_description:
+                                type: string
+                                maxLength: 30
+                                example: 17 NV Des Partes Drive Cab
+                              stock_status:
+                                title: ProductStockStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 16
+                                enum:
+                                  - Stock Part
+                                  - Nonstock Part
+                                  - Stock Package
+                                  - Nonstock Package
+                                example: Nonstock Package
+                              taxable_item_switch:
+                                type: boolean
+                                example: true
+                              tax_alcohol_class_code:
+                                type: string
+                                maxLength: 2
+                                example: '1'
+                              tax_pre_2017_alcohol_class_code:
+                                type: string
+                                maxLength: 2
+                                example: '2'
+                              tir_tier_code:
+                                type: string
+                                maxLength: 4
+                                example: BRW
+                              units_adjusted:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 35
+                              units_per_case:
+                                type: integer
+                                minimum: 0
+                                maximum: 9999
+                                example: 12
+                              units_per_standard_case:
+                                type: number
+                                minimum: 0
+                                maximum: 9999.99999
+                                example: 13.1
+                              units_produced:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 5192
+                              units_received:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_returned:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 8
+                              units_scheduled_for_production:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_shipped:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 1024
+                              units_to_reorder:
+                                type: integer
+                                minimum: 0
+                                maximum: 999999999
+                                example: 0
+                              uom_unit_of_measure_code:
+                                type: string
+                                maxLength: 2
+                                example: BX
+                              upc_code:
+                                type: string
+                                maxLength: 14
+                                example: ' '
+                              var_varietal_code:
+                                type: string
+                                maxLength: 2
+                                example: CS
+                              vendor_id:
+                                type: integer
+                                minimum: 0
+                                maximum: 999999
+                                example: 0
+                              vendor_sku:
+                                type: string
+                                maxLength: 20
+                                example: ' '
+                              wholesale_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              wine_club_allocation_status:
+                                title: WineClubAllocationStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 40
+                                enum:
+                                  - Allocation Active
+                                  - Allocation Inactive
+                                  - Not Applicable
+                                example: Allocation Inactive
+                              win_winery_code:
+                                type: string
+                                maxLength: 4
+                                example: CS
+                              yrs_vintage_code:
+                                type: string
+                                maxLength: 2
+                                example: '17'
+                              location_inventories:
+                                type: array
+                                items:
+                                  title: V1GETLocationInventoryObject
+                                  type: object
+                                  properties:
+                                    loc_location_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: BD
+                                    location_description:
+                                      type: string
+                                      maxLength: 30
+                                      example: Winery Bond
+                                    total_units_available:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 150
+                                    total_units_on_hand:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 300
+                                    total_units_reserved:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 150
+                                    units_on_hand_1_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 450
+                                    units_on_hand_2_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 500
+                                    units_on_wholesale_order:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 24
+                                    units_on_purchase_order:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                                    units_on_dtc_order:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 56
+                                    units_sold_dtc:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 512
+                                    units_sold_dtc_1_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 125
+                                    units_sold_dtc_2_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 20
+                                    units_on_dtc_future_order:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                                    units_sold_dtc_future:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                                    units_sold_dtc_future_1_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                                    units_sold_dtc_future_2_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                              product_images:
+                                type: array
+                                items:
+                                  title: V1GETProductImageUrlObject
+                                  type: object
+                                  properties:
+                                    image_description:
+                                      type: string
+                                      maxLength: 60
+                                      example: Part front image
+                                    image_filename:
+                                      type: string
+                                      maxLength: 30
+                                      example: PRTXYZ.JPEG
+                                    image_url:
+                                      type: string
+                                      maxLength: 512
+                                      example: 'http://azure.cloud.storage.com/some-part-image-file.JPEG'
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+  '/winery/v1/products/{product_id}/location_inventories':
+    get:
+      operationId: getV1WineryProductLocationInventories
+      tags:
+        - WineryProductsGET
+      summary: GET location_inventories array.
+      description: Retrieve the inventory information for a specific product resource.
+      parameters:
+        - in: path
+          name: product_id
+          description: This parameter in the path represents the unique product_id associated with a specific product resource.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok - The get of the location inventory array for a product was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          location_inventories:
+                            title: V1GETLocationInventoryObject
+                            type: object
+                            properties:
+                              loc_location_code:
+                                type: string
+                                maxLength: 2
+                                example: BD
+                              location_description:
+                                type: string
+                                maxLength: 30
+                                example: Winery Bond
+                              total_units_available:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 150
+                              total_units_on_hand:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 300
+                              total_units_reserved:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 150
+                              units_on_hand_1_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 450
+                              units_on_hand_2_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 500
+                              units_on_wholesale_order:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 24
+                              units_on_purchase_order:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_on_dtc_order:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 56
+                              units_sold_dtc:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 512
+                              units_sold_dtc_1_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 125
+                              units_sold_dtc_2_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 20
+                              units_on_dtc_future_order:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_sold_dtc_future:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_sold_dtc_future_1_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_sold_dtc_future_2_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+  '/winery/v1/products/{product_id}/location_inventories/{location_id}':
+    get:
+      operationId: getV1WineryProductLocationInventory
+      tags:
+        - WineryProductsGET
+      summary: GET specific location_inventory object.
+      description: Retrieve the inventory information for a specific product at a specific location at the winery.
+      parameters:
+        - in: path
+          name: product_id
+          description: This parameter in the path represents the unique product_id associated with a specific product resource.
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: location_id
+          description: This path parameter represents the unique location_id (location code) associated with a specific location_inventory object in the location_inventories array on a specific product resource.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok - The get of an vendor resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          location_inventory:
+                            title: V1GETLocationInventoryObject
+                            type: object
+                            properties:
+                              loc_location_code:
+                                type: string
+                                maxLength: 2
+                                example: BD
+                              location_description:
+                                type: string
+                                maxLength: 30
+                                example: Winery Bond
+                              total_units_available:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 150
+                              total_units_on_hand:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 300
+                              total_units_reserved:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 150
+                              units_on_hand_1_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 450
+                              units_on_hand_2_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 500
+                              units_on_wholesale_order:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 24
+                              units_on_purchase_order:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_on_dtc_order:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 56
+                              units_sold_dtc:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 512
+                              units_sold_dtc_1_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 125
+                              units_sold_dtc_2_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 20
+                              units_on_dtc_future_order:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_sold_dtc_future:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_sold_dtc_future_1_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_sold_dtc_future_2_month_prior:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+components:
+  securitySchemes:
+    AMSBearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    ProductDescriptionQueryParm:
+      name: product_description
+      in: query
+      description: A winery product has three description fields. This query parameter will use a 'contains' type search on these three fields for the provided string value.
+      required: false
+      schema:
+        type: string
+    ProductIdQueryParm:
+      name: product_id
+      in: query
+      description: This query parameter allows for searching by the unique product_id. Values provided will be compared to the product_id property of the resource using a 'starts-with' comparison method. No spaces are allowed in a product_id.
+      required: false
+      schema:
+        type: string
+    WholesaleActiveFlagQueryParm:
+      name: wholesale_active_status
+      in: query
+      description: This query parameter allows for parsing the winery products resources based on the value of the product's wholesale_active_status. Possible values are HOT ACTIVE and INACTIVE.
+      required: false
+      schema:
+        title: ActiveFlagEnum
+        x-tags:
+          - Enumerations
+        type: string
+        enum:
+          - Hot
+          - Active
+          - Inactive
+        maxLength: 8
+        example: Inactive
+    DTCActiveFlagQueryParm:
+      name: dtc_active_status
+      in: query
+      description: This query parameter allows for parsing the winery products resources based on the value of the product's dtc_active_status. Possible values are HOT ACTIVE and INACTIVE.
+      required: false
+      schema:
+        title: ActiveFlagEnum
+        x-tags:
+          - Enumerations
+        type: string
+        enum:
+          - Hot
+          - Active
+          - Inactive
+        maxLength: 8
+        example: Inactive
+    InventoryActiveFlagQueryParm:
+      name: inventory_active_status
+      in: query
+      description: This query parameter allows for parsing the winery products resources based on the value of the product's inventory_active_status. Possible values are HOT ACTIVE and INACTIVE.
+      required: false
+      schema:
+        title: ActiveFlagEnum
+        x-tags:
+          - Enumerations
+        type: string
+        enum:
+          - Hot
+          - Active
+          - Inactive
+        maxLength: 8
+        example: Inactive
+    TierCodeQueryParm:
+      name: tir_tier_code
+      in: query
+      description: This query parameter allows for parsing the winery products resources based on the value of the product's tier code. Possible values come from the user-defined code table with table ID TIR.
+      required: false
+      schema:
+        type: string
+    CategoryCodeQueryParm:
+      name: cat_category_code
+      in: query
+      description: This query parameter allows for parsing the winery products resources based on the value of the product's category code. Possible values come from the user-defined code table with table ID CAT.
+      required: false
+      schema:
+        type: string
+    ProductGroupCodeQueryParm:
+      name: pdg_product_group_code
+      in: query
+      description: This query parameter allows for parsing the winery products resources based on the value of the product's product group code code. Possible values come from the user-defined code table with table ID PDG.
+      required: false
+      schema:
+        type: string
+    VarietalCodeQueryParm:
+      name: var_varietal_code
+      in: query
+      description: This query parameter allows for parsing the winery products resources based on the value of the product's varietal code. Possible values come from the user-defined code table with table ID VAR.
+      required: false
+      schema:
+        type: string
+    PaginationQueryParm:
+      name: pagination
+      in: query
+      description: 'Query parameter that will allow for retrieving "pages" of results from the products resource. The format of the value passed must be the following, {number1},{number2}. The first numeric value indicates the number of results per page and the second numeric value indicates the requested page of results.'
+      required: false
+      schema:
+        type: string
+    ProductIDPathParm:
+      in: path
+      name: product_id
+      description: This parameter in the path represents the unique product_id associated with a specific product resource.
+      required: true
+      schema:
+        type: string
+    LocationIDPathParm:
+      in: path
+      name: location_id
+      description: This path parameter represents the unique location_id (location code) associated with a specific location_inventory object in the location_inventories array on a specific product resource.
+      required: true
+      schema:
+        type: string
+  responses:
+    200V1SuccessfulProductsGet:
+      description: Ok - The query of the winery products resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          products_found:
+                            type: integer
+                            example: 1
+                          products:
+                            title: V1GETProductObject
+                            type: object
+                            properties:
+                              alcohol_percent:
+                                type: number
+                                minimum: 0
+                                maximum: 999.999
+                                example: 14.5
+                              allocation_begin_date:
+                                type: string
+                                maxLength: 5
+                                example: 03/19
+                              allocation_method:
+                                title: AllocationMethodEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - No Allocation
+                                  - Annual Allocation
+                                  - Perpetual Allocation
+                                maxLength: 40
+                                example: Perpetual Allocation
+                              allocation_status:
+                                title: AllocationStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                enum:
+                                  - Not Allocated
+                                  - Allocation Setup Mode
+                                  - Allocation Active
+                                  - Allocation Inactive
+                                maxLength: 40
+                                example: Allocation Active
+                              bin_number:
+                                type: string
+                                maxLength: 6
+                                example: ' '
+                              brn_brand_code:
+                                type: string
+                                maxLength: 6
+                                example: DPDCS
+                              broker_commission_status:
+                                title: BrokerCommissionStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                enum:
+                                  - Allow
+                                  - Deny
+                                maxLength: 11
+                                example: Allow
+                              bsz_bottle_size_code:
+                                type: string
+                                maxLength: 2
+                                example: '7'
+                              cases_per_pallet:
+                                type: integer
+                                minimum: 0
+                                maximum: 999999999
+                                example: 56
+                              cat_wine_category_code:
+                                type: string
+                                maxLength: 4
+                                example: CSNV
+                              component_part_shipping_switch:
+                                type: boolean
+                                example: true
+                              costing_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              cost_revision_date:
+                                type: string
+                                maxLength: 10
+                                example: 01/23/2019
+                              ctc_custom_text_code:
+                                type: string
+                                maxLength: 4
+                                example: ' '
+                              description:
+                                type: string
+                                maxLength: 60
+                                example: 2017 Napa Valley Des Partes Drive Cabernet Sauvignon
+                              dtc_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              etp_profit_analysis_etp_code:
+                                type: string
+                                maxLength: 2
+                                example: ' '
+                              excise_tax_payment_method:
+                                title: ExciseTaxPaymentMethodEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                enum:
+                                  - Record As Cost Of Goods
+                                  - Record As Expense Upon Sale
+                                  - No Excise Tax
+                                maxLength: 40
+                                example: Record As Cost Of Goods
+                              excise_tax_recognition_method:
+                                type: string
+                                maxLength: 40
+                                example: Expense The Tax
+                              federal_cola_id:
+                                type: string
+                                maxLength: 20
+                                example: ' '
+                              gga_supplier_gga_code:
+                                type: string
+                                maxLength: 6
+                                example: ' '
+                              gift_card_switch:
+                                type: boolean
+                                example: true
+                              highest_price_lvl_id:
+                                type: string
+                                maxLength: 4
+                                example: PRT
+                              inu_intended_use_code:
+                                type: string
+                                maxLength: 6
+                                example: NA
+                              inventory_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              last_ship_date:
+                                type: string
+                                maxLength: 10
+                                example: 04/31/2019
+                              lbl_label_code:
+                                type: string
+                                maxLength: 18
+                                example: CSNVDPD
+                              lbl_profit_analysis_label_code:
+                                type: string
+                                maxLength: 18
+                                example: ' '
+                              lot_number:
+                                type: integer
+                                minimum: 0
+                                maximum: 99
+                                example: 2
+                              master_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              on_hand_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              pdg_product_group_code:
+                                type: string
+                                maxLength: 6
+                                example: NORTH
+                              pdl_product_line_code:
+                                type: string
+                                maxLength: 2
+                                example: NA
+                              pfc_financial_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              pkg_package_code:
+                                type: string
+                                maxLength: 4
+                                example: ' '
+                              pounds_per_case:
+                                type: number
+                                minimum: 0
+                                maximum: 99999999.9
+                                example: 34.5
+                              po_lead_days:
+                                type: integer
+                                minimum: 0
+                                maximum: 999
+                                example: 0
+                              product_availability_rules_exemption_status:
+                                title: ProdAvailRuleExemptEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 20
+                                enum:
+                                  - Not Exempt
+                                  - Exempt
+                                example: Not Exempt
+                              product_id:
+                                type: string
+                                maxLength: 20
+                                example: 17CSNVDPD
+                              purchasing_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              quantity_discount_switch:
+                                type: boolean
+                                example: false
+                              release_date:
+                                type: string
+                                maxLength: 10
+                                example: 04/15/2019
+                              reorder_point_units:
+                                type: integer
+                                minimum: 0
+                                maximum: 999999999
+                                example: 0
+                              revision_date:
+                                type: string
+                                maxLength: 10
+                                example: 02/15/2019
+                              scc_code:
+                                type: string
+                                maxLength: 14
+                                example: ' '
+                              setup_date:
+                                type: string
+                                maxLength: 10
+                                example: 01/13/2019
+                              short_description:
+                                type: string
+                                maxLength: 20
+                                example: 17 NV DPD Cab Sauv
+                              spc_state_product_category_code:
+                                type: string
+                                maxLength: 2
+                                example: ' '
+                              standard_description:
+                                type: string
+                                maxLength: 30
+                                example: 17 NV Des Partes Drive Cab
+                              stock_status:
+                                title: ProductStockStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 16
+                                enum:
+                                  - Stock Part
+                                  - Nonstock Part
+                                  - Stock Package
+                                  - Nonstock Package
+                                example: Nonstock Package
+                              taxable_item_switch:
+                                type: boolean
+                                example: true
+                              tax_alcohol_class_code:
+                                type: string
+                                maxLength: 2
+                                example: '1'
+                              tax_pre_2017_alcohol_class_code:
+                                type: string
+                                maxLength: 2
+                                example: '2'
+                              tir_tier_code:
+                                type: string
+                                maxLength: 4
+                                example: BRW
+                              units_adjusted:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 35
+                              units_per_case:
+                                type: integer
+                                minimum: 0
+                                maximum: 9999
+                                example: 12
+                              units_per_standard_case:
+                                type: number
+                                minimum: 0
+                                maximum: 9999.99999
+                                example: 13.1
+                              units_produced:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 5192
+                              units_received:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_returned:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 8
+                              units_scheduled_for_production:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 0
+                              units_shipped:
+                                type: integer
+                                minimum: -999999999
+                                maximum: 999999999
+                                example: 1024
+                              units_to_reorder:
+                                type: integer
+                                minimum: 0
+                                maximum: 999999999
+                                example: 0
+                              uom_unit_of_measure_code:
+                                type: string
+                                maxLength: 2
+                                example: BX
+                              upc_code:
+                                type: string
+                                maxLength: 14
+                                example: ' '
+                              var_varietal_code:
+                                type: string
+                                maxLength: 2
+                                example: CS
+                              vendor_id:
+                                type: integer
+                                minimum: 0
+                                maximum: 999999
+                                example: 0
+                              vendor_sku:
+                                type: string
+                                maxLength: 20
+                                example: ' '
+                              wholesale_active_status:
+                                title: ActiveFlagEnum
+                                x-tags:
+                                  - Enumerations
+                                type: string
+                                enum:
+                                  - Hot
+                                  - Active
+                                  - Inactive
+                                maxLength: 8
+                                example: Inactive
+                              wine_club_allocation_status:
+                                title: WineClubAllocationStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 40
+                                enum:
+                                  - Allocation Active
+                                  - Allocation Inactive
+                                  - Not Applicable
+                                example: Allocation Inactive
+                              win_winery_code:
+                                type: string
+                                maxLength: 4
+                                example: CS
+                              yrs_vintage_code:
+                                type: string
+                                maxLength: 2
+                                example: '17'
+                              location_inventories:
+                                type: array
+                                items:
+                                  title: V1GETLocationInventoryObject
+                                  type: object
+                                  properties:
+                                    loc_location_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: BD
+                                    location_description:
+                                      type: string
+                                      maxLength: 30
+                                      example: Winery Bond
+                                    total_units_available:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 150
+                                    total_units_on_hand:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 300
+                                    total_units_reserved:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 150
+                                    units_on_hand_1_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 450
+                                    units_on_hand_2_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 500
+                                    units_on_wholesale_order:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 24
+                                    units_on_purchase_order:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                                    units_on_dtc_order:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 56
+                                    units_sold_dtc:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 512
+                                    units_sold_dtc_1_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 125
+                                    units_sold_dtc_2_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 20
+                                    units_on_dtc_future_order:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                                    units_sold_dtc_future:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                                    units_sold_dtc_future_1_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                                    units_sold_dtc_future_2_month_prior:
+                                      type: integer
+                                      minimum: -999999999
+                                      maximum: 999999999
+                                      example: 0
+                              product_images:
+                                type: array
+                                items:
+                                  title: V1GETProductImageUrlObject
+                                  type: object
+                                  properties:
+                                    image_description:
+                                      type: string
+                                      maxLength: 60
+                                      example: Part front image
+                                    image_filename:
+                                      type: string
+                                      maxLength: 30
+                                      example: PRTXYZ.JPEG
+                                    image_url:
+                                      type: string
+                                      maxLength: 512
+                                      example: 'http://azure.cloud.storage.com/some-part-image-file.JPEG'
+    200V1SuccessfulProductGet:
+      description: Ok - The get of an winery product resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      product:
+                        title: V1GETProductObject
+                        type: object
+                        properties:
+                          alcohol_percent:
+                            type: number
+                            minimum: 0
+                            maximum: 999.999
+                            example: 14.5
+                          allocation_begin_date:
+                            type: string
+                            maxLength: 5
+                            example: 03/19
+                          allocation_method:
+                            title: AllocationMethodEnum
+                            x-tags:
+                              - Enumerations
+                            type: string
+                            enum:
+                              - No Allocation
+                              - Annual Allocation
+                              - Perpetual Allocation
+                            maxLength: 40
+                            example: Perpetual Allocation
+                          allocation_status:
+                            title: AllocationStatusEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            enum:
+                              - Not Allocated
+                              - Allocation Setup Mode
+                              - Allocation Active
+                              - Allocation Inactive
+                            maxLength: 40
+                            example: Allocation Active
+                          bin_number:
+                            type: string
+                            maxLength: 6
+                            example: ' '
+                          brn_brand_code:
+                            type: string
+                            maxLength: 6
+                            example: DPDCS
+                          broker_commission_status:
+                            title: BrokerCommissionStatusEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            enum:
+                              - Allow
+                              - Deny
+                            maxLength: 11
+                            example: Allow
+                          bsz_bottle_size_code:
+                            type: string
+                            maxLength: 2
+                            example: '7'
+                          cases_per_pallet:
+                            type: integer
+                            minimum: 0
+                            maximum: 999999999
+                            example: 56
+                          cat_wine_category_code:
+                            type: string
+                            maxLength: 4
+                            example: CSNV
+                          component_part_shipping_switch:
+                            type: boolean
+                            example: true
+                          costing_active_status:
+                            title: ActiveFlagEnum
+                            x-tags:
+                              - Enumerations
+                            type: string
+                            enum:
+                              - Hot
+                              - Active
+                              - Inactive
+                            maxLength: 8
+                            example: Inactive
+                          cost_revision_date:
+                            type: string
+                            maxLength: 10
+                            example: 01/23/2019
+                          ctc_custom_text_code:
+                            type: string
+                            maxLength: 4
+                            example: ' '
+                          description:
+                            type: string
+                            maxLength: 60
+                            example: 2017 Napa Valley Des Partes Drive Cabernet Sauvignon
+                          dtc_active_status:
+                            title: ActiveFlagEnum
+                            x-tags:
+                              - Enumerations
+                            type: string
+                            enum:
+                              - Hot
+                              - Active
+                              - Inactive
+                            maxLength: 8
+                            example: Inactive
+                          etp_profit_analysis_etp_code:
+                            type: string
+                            maxLength: 2
+                            example: ' '
+                          excise_tax_payment_method:
+                            title: ExciseTaxPaymentMethodEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            enum:
+                              - Record As Cost Of Goods
+                              - Record As Expense Upon Sale
+                              - No Excise Tax
+                            maxLength: 40
+                            example: Record As Cost Of Goods
+                          excise_tax_recognition_method:
+                            type: string
+                            maxLength: 40
+                            example: Expense The Tax
+                          federal_cola_id:
+                            type: string
+                            maxLength: 20
+                            example: ' '
+                          gga_supplier_gga_code:
+                            type: string
+                            maxLength: 6
+                            example: ' '
+                          gift_card_switch:
+                            type: boolean
+                            example: true
+                          highest_price_lvl_id:
+                            type: string
+                            maxLength: 4
+                            example: PRT
+                          inu_intended_use_code:
+                            type: string
+                            maxLength: 6
+                            example: NA
+                          inventory_active_status:
+                            title: ActiveFlagEnum
+                            x-tags:
+                              - Enumerations
+                            type: string
+                            enum:
+                              - Hot
+                              - Active
+                              - Inactive
+                            maxLength: 8
+                            example: Inactive
+                          last_ship_date:
+                            type: string
+                            maxLength: 10
+                            example: 04/31/2019
+                          lbl_label_code:
+                            type: string
+                            maxLength: 18
+                            example: CSNVDPD
+                          lbl_profit_analysis_label_code:
+                            type: string
+                            maxLength: 18
+                            example: ' '
+                          lot_number:
+                            type: integer
+                            minimum: 0
+                            maximum: 99
+                            example: 2
+                          master_active_status:
+                            title: ActiveFlagEnum
+                            x-tags:
+                              - Enumerations
+                            type: string
+                            enum:
+                              - Hot
+                              - Active
+                              - Inactive
+                            maxLength: 8
+                            example: Inactive
+                          on_hand_active_status:
+                            title: ActiveFlagEnum
+                            x-tags:
+                              - Enumerations
+                            type: string
+                            enum:
+                              - Hot
+                              - Active
+                              - Inactive
+                            maxLength: 8
+                            example: Inactive
+                          pdg_product_group_code:
+                            type: string
+                            maxLength: 6
+                            example: NORTH
+                          pdl_product_line_code:
+                            type: string
+                            maxLength: 2
+                            example: NA
+                          pfc_financial_code:
+                            type: string
+                            maxLength: 2
+                            example: '01'
+                          pkg_package_code:
+                            type: string
+                            maxLength: 4
+                            example: ' '
+                          pounds_per_case:
+                            type: number
+                            minimum: 0
+                            maximum: 99999999.9
+                            example: 34.5
+                          po_lead_days:
+                            type: integer
+                            minimum: 0
+                            maximum: 999
+                            example: 0
+                          product_availability_rules_exemption_status:
+                            title: ProdAvailRuleExemptEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            maxLength: 20
+                            enum:
+                              - Not Exempt
+                              - Exempt
+                            example: Not Exempt
+                          product_id:
+                            type: string
+                            maxLength: 20
+                            example: 17CSNVDPD
+                          purchasing_active_status:
+                            title: ActiveFlagEnum
+                            x-tags:
+                              - Enumerations
+                            type: string
+                            enum:
+                              - Hot
+                              - Active
+                              - Inactive
+                            maxLength: 8
+                            example: Inactive
+                          quantity_discount_switch:
+                            type: boolean
+                            example: false
+                          release_date:
+                            type: string
+                            maxLength: 10
+                            example: 04/15/2019
+                          reorder_point_units:
+                            type: integer
+                            minimum: 0
+                            maximum: 999999999
+                            example: 0
+                          revision_date:
+                            type: string
+                            maxLength: 10
+                            example: 02/15/2019
+                          scc_code:
+                            type: string
+                            maxLength: 14
+                            example: ' '
+                          setup_date:
+                            type: string
+                            maxLength: 10
+                            example: 01/13/2019
+                          short_description:
+                            type: string
+                            maxLength: 20
+                            example: 17 NV DPD Cab Sauv
+                          spc_state_product_category_code:
+                            type: string
+                            maxLength: 2
+                            example: ' '
+                          standard_description:
+                            type: string
+                            maxLength: 30
+                            example: 17 NV Des Partes Drive Cab
+                          stock_status:
+                            title: ProductStockStatusEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            maxLength: 16
+                            enum:
+                              - Stock Part
+                              - Nonstock Part
+                              - Stock Package
+                              - Nonstock Package
+                            example: Nonstock Package
+                          taxable_item_switch:
+                            type: boolean
+                            example: true
+                          tax_alcohol_class_code:
+                            type: string
+                            maxLength: 2
+                            example: '1'
+                          tax_pre_2017_alcohol_class_code:
+                            type: string
+                            maxLength: 2
+                            example: '2'
+                          tir_tier_code:
+                            type: string
+                            maxLength: 4
+                            example: BRW
+                          units_adjusted:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 35
+                          units_per_case:
+                            type: integer
+                            minimum: 0
+                            maximum: 9999
+                            example: 12
+                          units_per_standard_case:
+                            type: number
+                            minimum: 0
+                            maximum: 9999.99999
+                            example: 13.1
+                          units_produced:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 5192
+                          units_received:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_returned:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 8
+                          units_scheduled_for_production:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_shipped:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 1024
+                          units_to_reorder:
+                            type: integer
+                            minimum: 0
+                            maximum: 999999999
+                            example: 0
+                          uom_unit_of_measure_code:
+                            type: string
+                            maxLength: 2
+                            example: BX
+                          upc_code:
+                            type: string
+                            maxLength: 14
+                            example: ' '
+                          var_varietal_code:
+                            type: string
+                            maxLength: 2
+                            example: CS
+                          vendor_id:
+                            type: integer
+                            minimum: 0
+                            maximum: 999999
+                            example: 0
+                          vendor_sku:
+                            type: string
+                            maxLength: 20
+                            example: ' '
+                          wholesale_active_status:
+                            title: ActiveFlagEnum
+                            x-tags:
+                              - Enumerations
+                            type: string
+                            enum:
+                              - Hot
+                              - Active
+                              - Inactive
+                            maxLength: 8
+                            example: Inactive
+                          wine_club_allocation_status:
+                            title: WineClubAllocationStatusEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            maxLength: 40
+                            enum:
+                              - Allocation Active
+                              - Allocation Inactive
+                              - Not Applicable
+                            example: Allocation Inactive
+                          win_winery_code:
+                            type: string
+                            maxLength: 4
+                            example: CS
+                          yrs_vintage_code:
+                            type: string
+                            maxLength: 2
+                            example: '17'
+                          location_inventories:
+                            type: array
+                            items:
+                              title: V1GETLocationInventoryObject
+                              type: object
+                              properties:
+                                loc_location_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: BD
+                                location_description:
+                                  type: string
+                                  maxLength: 30
+                                  example: Winery Bond
+                                total_units_available:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 150
+                                total_units_on_hand:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 300
+                                total_units_reserved:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 150
+                                units_on_hand_1_month_prior:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 450
+                                units_on_hand_2_month_prior:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 500
+                                units_on_wholesale_order:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 24
+                                units_on_purchase_order:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 0
+                                units_on_dtc_order:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 56
+                                units_sold_dtc:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 512
+                                units_sold_dtc_1_month_prior:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 125
+                                units_sold_dtc_2_month_prior:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 20
+                                units_on_dtc_future_order:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 0
+                                units_sold_dtc_future:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 0
+                                units_sold_dtc_future_1_month_prior:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 0
+                                units_sold_dtc_future_2_month_prior:
+                                  type: integer
+                                  minimum: -999999999
+                                  maximum: 999999999
+                                  example: 0
+                          product_images:
+                            type: array
+                            items:
+                              title: V1GETProductImageUrlObject
+                              type: object
+                              properties:
+                                image_description:
+                                  type: string
+                                  maxLength: 60
+                                  example: Part front image
+                                image_filename:
+                                  type: string
+                                  maxLength: 30
+                                  example: PRTXYZ.JPEG
+                                image_url:
+                                  type: string
+                                  maxLength: 512
+                                  example: 'http://azure.cloud.storage.com/some-part-image-file.JPEG'
+    200V1SuccessfulLocationInventoryArrayGet:
+      description: Ok - The get of the location inventory array for a product was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      location_inventories:
+                        title: V1GETLocationInventoryObject
+                        type: object
+                        properties:
+                          loc_location_code:
+                            type: string
+                            maxLength: 2
+                            example: BD
+                          location_description:
+                            type: string
+                            maxLength: 30
+                            example: Winery Bond
+                          total_units_available:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 150
+                          total_units_on_hand:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 300
+                          total_units_reserved:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 150
+                          units_on_hand_1_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 450
+                          units_on_hand_2_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 500
+                          units_on_wholesale_order:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 24
+                          units_on_purchase_order:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_on_dtc_order:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 56
+                          units_sold_dtc:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 512
+                          units_sold_dtc_1_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 125
+                          units_sold_dtc_2_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 20
+                          units_on_dtc_future_order:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_sold_dtc_future:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_sold_dtc_future_1_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_sold_dtc_future_2_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+    200V1SuccessfulLocationInventoryGet:
+      description: Ok - The get of an vendor resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      location_inventory:
+                        title: V1GETLocationInventoryObject
+                        type: object
+                        properties:
+                          loc_location_code:
+                            type: string
+                            maxLength: 2
+                            example: BD
+                          location_description:
+                            type: string
+                            maxLength: 30
+                            example: Winery Bond
+                          total_units_available:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 150
+                          total_units_on_hand:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 300
+                          total_units_reserved:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 150
+                          units_on_hand_1_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 450
+                          units_on_hand_2_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 500
+                          units_on_wholesale_order:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 24
+                          units_on_purchase_order:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_on_dtc_order:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 56
+                          units_sold_dtc:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 512
+                          units_sold_dtc_1_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 125
+                          units_sold_dtc_2_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 20
+                          units_on_dtc_future_order:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_sold_dtc_future:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_sold_dtc_future_1_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+                          units_sold_dtc_future_2_month_prior:
+                            type: integer
+                            minimum: -999999999
+                            maximum: 999999999
+                            example: 0
+    400BadParmsGetResponse:
+      description: The query parameters used in the query of the dtc_orders endpoint were invalid.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Query Parameters Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      potential_query_parameters:
+                        title: PotentialQueryParms
+                        type: array
+                        minItems: 1
+                        items:
+                          anyOf:
+                            - title: QueryParm1Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: FIXED_STRING_PARM
+                                parameter_type:
+                                  type: string
+                                  example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                parameter_notes:
+                                  type: string
+                                  example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                            - title: QueryParm2Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: STRING_SEARCH_PARM
+                                parameter_type:
+                                  type: string
+                                  example: String search parameter (generally contains type text search)
+                                parameter_notes:
+                                  type: string
+                                  example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                            - title: QueryParm3Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: NUMERIC_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Numeric parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                            - title: QueryParm4Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: DATE_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Date parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+    401UnauthorizedResponse:
+      description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+      content:
+        application/json:
+          schema:
+            title: Unauthorized - Invalid/Missing Authorization GUID Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    type: string
+                    example: Invalid authorization GUID.
+    403ForbiddenResponse:
+      description: The API User does not have access to the requested resource.
+      content:
+        application/json:
+          schema:
+            title: Forbidden - Access Not Permitted Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                required:
+                  - error_state
+                  - error_msg
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    oneOf:
+                      - title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      - title: InvalidImpersonationGuidMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: Invalid Impersonation Guid
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        oneOf:
+                          - title: NoApiAccessMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the called method on the called resource.
+                          - title: AmsUserImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the GET method on the dtc_orders API resource
+                          - title: DtcCustImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+    404NotFoundResponse:
+      description: The requested API resource does not exist.
+      content:
+        application/json:
+          schema:
+            title: Not Found - Resource Does Not Exist Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        title: ResourceNotFoundMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: API resource with provided ID not found.

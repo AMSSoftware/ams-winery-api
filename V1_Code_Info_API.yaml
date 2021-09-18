@@ -1,0 +1,1776 @@
+openapi: 3.0.0
+info:
+  title: V1 AMS Winery Code Information API
+  description: |
+    RESTful API access to a resource that provides information about codes in the AMS winery database. Using information provided in the request, the endpoint will return information about one of the user-defined codes in the AMS winery system.
+    <br/>
+    <h1>Version Control Scheme</h1>
+    <p>Versions will be relatively static, when breaking/logic changes occur a 
+    new version will be created.</p>
+    <hr/>
+    <h1>Revision Log</h1>
+    <ul>
+    <li>2019-06-03 - KAS - Brand new.</li>
+    <li>2020-03-06 - KAS - Finish up design.</li>
+    <li>2021-09-14 - KAS - Clean up, re-organize a bit, and import into Stoplight Studio/ReadMe. This involves the introduction of 'model' files, rather than the 'domains' that SwaggerHub allows for.</li>
+    </ul>
+  contact:
+    name: Helpdesk API Support
+    email: apisupport@amssoftware.com
+  license:
+    name: License Required
+    url: 'http://www.amssoftware.com'
+  version: '2019-06-03'
+servers:
+  - description: Development Server
+    url: 'https://thor2012-test.amscloudconnect.amssoftware.com/api'
+security:
+  - AMSBearerAuth: []
+tags:
+  - name: CodeInfoGET
+    description: GETs to the API resource that provides information about user-definable codes in the AMS system.
+paths:
+  /winery/v1/code_info:
+    get:
+      operationId: getWineryCodeInfo
+      tags:
+        - CodeInfoGET
+      summary: Obtains information about a user-defined code in AMS database.
+      description: 'When a GET is issued to the code_info endpoint with the appropriate parameters it will provide contextual/identifying information about a particular user-defined code attached to an API object property OR it will return a listing of the user-defined entries in a given table used by the AMS system. The required query parameter is the request_type parameter, which will further dictate the other parameters required for a given request. When performing a ''code_desc'' type request, at a minimum the property name, the resource the property is attached to, and the code value for the property are required. A collection name and/or sub-collection name can also be provided if the property is attached to one of those sub-objects of the resource. When performing a ''table_listing'' type request, the 3 character table_id is required to complete the code_info request.'
+      parameters:
+        - name: request_type
+          in: query
+          description: This parameter represents the type of request being made of the code_info resource. The two types are 'code_desc' and 'table_listing'
+          required: true
+          schema:
+            title: RequestTypeEnum
+            x-tags:
+              - Enumeration
+            type: string
+            enum:
+              - code_desc
+              - table_listing
+        - name: version
+          in: query
+          description: This parameter represents the version of the resource to which the code is attached.
+          required: false
+          schema:
+            type: string
+        - name: resource
+          in: query
+          description: This parameter represents the resource to which the code is attached.
+          required: false
+          schema:
+            type: string
+        - name: collection
+          in: query
+          description: This parameter represents the collection on the resource to which the code is attached. The lack of a collection parm value indicates the code is attached to a resource itself.
+          required: false
+          schema:
+            type: string
+        - name: sub_collection
+          in: query
+          description: 'This parameter represents the sub-collection on the collection, belonging to the resource to which the code is attached. The lack of a sub-collection at the least indicates that the code is attached to a collection or the resource itself.'
+          required: false
+          schema:
+            type: string
+        - name: property
+          in: query
+          description: This parameter represents the property name for the code in question. This is the JSON key name the code is attached to.
+          required: false
+          schema:
+            type: string
+        - name: code_value
+          in: query
+          description: This parameter represents the code value being looked up. It is the value attached to the JSON key.
+          required: false
+          schema:
+            type: string
+        - name: table_id
+          in: query
+          description: This parameter represents ID for one of the winery-maintained code tables in the AMS system.
+          required: false
+          schema:
+            title: TableIDEnum
+            x-tags:
+              - Enumeration
+            type: string
+            minLength: 3
+            maxLength: 3
+            enum:
+              - 7CL
+              - 7LN
+              - AAA
+              - ACE
+              - ACT
+              - ACW
+              - AGA
+              - AGC
+              - AGD
+              - AGM
+              - AGV
+              - ALC
+              - ANC
+              - AP9
+              - APC
+              - APE
+              - APG
+              - APH
+              - APL
+              - APM
+              - APS
+              - APT
+              - APV
+              - ARC
+              - ARD
+              - ARI
+              - ARL
+              - ARO
+              - ARP
+              - ARS
+              - ART
+              - AVR
+              - BBS
+              - BKR
+              - BLB
+              - BLS
+              - BRC
+              - BRN
+              - BSZ
+              - CAR
+              - CAT
+              - CCT
+              - CDZ
+              - CFC
+              - CGC
+              - CKA
+              - CLC
+              - CLK
+              - CLN
+              - CON
+              - COR
+              - COU
+              - CST
+              - CSZ
+              - CTC
+              - CTR
+              - CTT
+              - CTY
+              - CUS
+              - CZZ
+              - DAC
+              - DCX
+              - DCZ
+              - DDR
+              - DGC
+              - DIV
+              - DLS
+              - DLZ
+              - DPT
+              - DRR
+              - DRT
+              - DZC
+              - DZF
+              - DZP
+              - EBC
+              - ECA
+              - ECC
+              - EDI
+              - EMT
+              - ETE
+              - ETP
+              - ETX
+              - FGH
+              - FTT
+              - GGA
+              - GL1
+              - GLP
+              - GRP
+              - INU
+              - IR7
+              - IRC
+              - IRM
+              - IRS
+              - ITC
+              - ITE
+              - LAH
+              - LAL
+              - LAT
+              - LBC
+              - LBL
+              - LCR
+              - LEM
+              - LIC
+              - LM1
+              - LM2
+              - LM3
+              - LOC
+              - LTS
+              - LTT
+              - MBC
+              - MFG
+              - MKT
+              - MLC
+              - MRT
+              - NVC
+              - O3P
+              - OCD
+              - ODS
+              - OEC
+              - OEH
+              - OGC
+              - OHT
+              - OLS
+              - OPK
+              - OPM
+              - OPT
+              - ORT
+              - OST
+              - OTP
+              - PAC
+              - PAG
+              - PAR
+              - PCH
+              - PCM
+              - PCR
+              - PCS
+              - PDG
+              - PDL
+              - PDT
+              - PFC
+              - PGB
+              - PKG
+              - PPC
+              - PPP
+              - PRC
+              - PRS
+              - PRT
+              - PS1
+              - PSC
+              - RAC
+              - RAN
+              - RCC
+              - RCH
+              - REF
+              - REG
+              - REM
+              - RFT
+              - RGN
+              - RLT
+              - ROL
+              - RSC
+              - RTS
+              - SAT
+              - SCA
+              - SCC
+              - SCT
+              - SGA
+              - SHP
+              - SKU
+              - SMN
+              - SPC
+              - SPH
+              - SPR
+              - SPT
+              - STA
+              - STC
+              - STD
+              - STF
+              - STX
+              - SUM
+              - TAC
+              - TAK
+              - TAX
+              - TBC
+              - TCC
+              - TCF
+              - TCT
+              - TCX
+              - TIR
+              - TMM
+              - TPC
+              - TPT
+              - TRE
+              - TRL
+              - TRM
+              - TRR
+              - TRT
+              - TTC
+              - TTT
+              - TTX
+              - TWC
+              - TWP
+              - TWT
+              - UDC
+              - UOM
+              - VAR
+              - VPH
+              - VSP
+              - WHS
+              - WIN
+              - YRS
+              - ZZZ
+            example: APL
+      responses:
+        '200':
+          description: Ok - The GET against the code_info resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          code_info:
+                            type: object
+                            properties:
+                              table_id:
+                                title: TableIDEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                minLength: 3
+                                maxLength: 3
+                                enum:
+                                  - 7CL
+                                  - 7LN
+                                  - AAA
+                                  - ACE
+                                  - ACT
+                                  - ACW
+                                  - AGA
+                                  - AGC
+                                  - AGD
+                                  - AGM
+                                  - AGV
+                                  - ALC
+                                  - ANC
+                                  - AP9
+                                  - APC
+                                  - APE
+                                  - APG
+                                  - APH
+                                  - APL
+                                  - APM
+                                  - APS
+                                  - APT
+                                  - APV
+                                  - ARC
+                                  - ARD
+                                  - ARI
+                                  - ARL
+                                  - ARO
+                                  - ARP
+                                  - ARS
+                                  - ART
+                                  - AVR
+                                  - BBS
+                                  - BKR
+                                  - BLB
+                                  - BLS
+                                  - BRC
+                                  - BRN
+                                  - BSZ
+                                  - CAR
+                                  - CAT
+                                  - CCT
+                                  - CDZ
+                                  - CFC
+                                  - CGC
+                                  - CKA
+                                  - CLC
+                                  - CLK
+                                  - CLN
+                                  - CON
+                                  - COR
+                                  - COU
+                                  - CST
+                                  - CSZ
+                                  - CTC
+                                  - CTR
+                                  - CTT
+                                  - CTY
+                                  - CUS
+                                  - CZZ
+                                  - DAC
+                                  - DCX
+                                  - DCZ
+                                  - DDR
+                                  - DGC
+                                  - DIV
+                                  - DLS
+                                  - DLZ
+                                  - DPT
+                                  - DRR
+                                  - DRT
+                                  - DZC
+                                  - DZF
+                                  - DZP
+                                  - EBC
+                                  - ECA
+                                  - ECC
+                                  - EDI
+                                  - EMT
+                                  - ETE
+                                  - ETP
+                                  - ETX
+                                  - FGH
+                                  - FTT
+                                  - GGA
+                                  - GL1
+                                  - GLP
+                                  - GRP
+                                  - INU
+                                  - IR7
+                                  - IRC
+                                  - IRM
+                                  - IRS
+                                  - ITC
+                                  - ITE
+                                  - LAH
+                                  - LAL
+                                  - LAT
+                                  - LBC
+                                  - LBL
+                                  - LCR
+                                  - LEM
+                                  - LIC
+                                  - LM1
+                                  - LM2
+                                  - LM3
+                                  - LOC
+                                  - LTS
+                                  - LTT
+                                  - MBC
+                                  - MFG
+                                  - MKT
+                                  - MLC
+                                  - MRT
+                                  - NVC
+                                  - O3P
+                                  - OCD
+                                  - ODS
+                                  - OEC
+                                  - OEH
+                                  - OGC
+                                  - OHT
+                                  - OLS
+                                  - OPK
+                                  - OPM
+                                  - OPT
+                                  - ORT
+                                  - OST
+                                  - OTP
+                                  - PAC
+                                  - PAG
+                                  - PAR
+                                  - PCH
+                                  - PCM
+                                  - PCR
+                                  - PCS
+                                  - PDG
+                                  - PDL
+                                  - PDT
+                                  - PFC
+                                  - PGB
+                                  - PKG
+                                  - PPC
+                                  - PPP
+                                  - PRC
+                                  - PRS
+                                  - PRT
+                                  - PS1
+                                  - PSC
+                                  - RAC
+                                  - RAN
+                                  - RCC
+                                  - RCH
+                                  - REF
+                                  - REG
+                                  - REM
+                                  - RFT
+                                  - RGN
+                                  - RLT
+                                  - ROL
+                                  - RSC
+                                  - RTS
+                                  - SAT
+                                  - SCA
+                                  - SCC
+                                  - SCT
+                                  - SGA
+                                  - SHP
+                                  - SKU
+                                  - SMN
+                                  - SPC
+                                  - SPH
+                                  - SPR
+                                  - SPT
+                                  - STA
+                                  - STC
+                                  - STD
+                                  - STF
+                                  - STX
+                                  - SUM
+                                  - TAC
+                                  - TAK
+                                  - TAX
+                                  - TBC
+                                  - TCC
+                                  - TCF
+                                  - TCT
+                                  - TCX
+                                  - TIR
+                                  - TMM
+                                  - TPC
+                                  - TPT
+                                  - TRE
+                                  - TRL
+                                  - TRM
+                                  - TRR
+                                  - TRT
+                                  - TTC
+                                  - TTT
+                                  - TTX
+                                  - TWC
+                                  - TWP
+                                  - TWT
+                                  - UDC
+                                  - UOM
+                                  - VAR
+                                  - VPH
+                                  - VSP
+                                  - WHS
+                                  - WIN
+                                  - YRS
+                                  - ZZZ
+                                example: APL
+                              table_name:
+                                type: string
+                                maxLength: 40
+                                example: AP Ledger Code Table
+                              num_entries_returned:
+                                type: integer
+                                minimum: 0
+                                maximum: 999999999
+                                example: 23
+                              date_table_last_updated:
+                                type: string
+                                minLength: 10
+                                maxLength: 10
+                                example: 02/03/2020
+                              table_listing:
+                                type: array
+                                minItems: 0
+                                items:
+                                  type: object
+                                  properties:
+                                    code:
+                                      type: string
+                                      maxLength: 20
+                                      example: '01'
+                                    code_description:
+                                      type: string
+                                      maxLength: 60
+                                      example: Example Ledger Code
+        '400':
+          description: The query parameters used in the query of the code_info endpoint were invalid.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Query Parameters Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          potential_query_parameters:
+                            title: PotentialQueryParms
+                            type: array
+                            minItems: 1
+                            items:
+                              anyOf:
+                                - title: QueryParm1Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: FIXED_STRING_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                    parameter_notes:
+                                      type: string
+                                      example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                                - title: QueryParm2Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: STRING_SEARCH_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: String search parameter (generally contains type text search)
+                                    parameter_notes:
+                                      type: string
+                                      example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                                - title: QueryParm3Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: NUMERIC_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Numeric parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                                - title: QueryParm4Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: DATE_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Date parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+components:
+  securitySchemes:
+    AMSBearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    RequestTypeParm:
+      name: request_type
+      in: query
+      description: This parameter represents the type of request being made of the code_info resource. The two types are 'code_desc' and 'table_listing'
+      required: true
+      schema:
+        title: RequestTypeEnum
+        x-tags:
+          - Enumeration
+        type: string
+        enum:
+          - code_desc
+          - table_listing
+    VersionParm:
+      name: version
+      in: query
+      description: This parameter represents the version of the resource to which the code is attached.
+      required: false
+      schema:
+        type: string
+    ResourceParm:
+      name: resource
+      in: query
+      description: This parameter represents the resource to which the code is attached.
+      required: false
+      schema:
+        type: string
+    CollectionParm:
+      name: collection
+      in: query
+      description: This parameter represents the collection on the resource to which the code is attached. The lack of a collection parm value indicates the code is attached to a resource itself.
+      required: false
+      schema:
+        type: string
+    SubCollectionParm:
+      name: sub_collection
+      in: query
+      description: 'This parameter represents the sub-collection on the collection, belonging to the resource to which the code is attached. The lack of a sub-collection at the least indicates that the code is attached to a collection or the resource itself.'
+      required: false
+      schema:
+        type: string
+    PropertyParm:
+      name: property
+      in: query
+      description: This parameter represents the property name for the code in question. This is the JSON key name the code is attached to.
+      required: false
+      schema:
+        type: string
+    CodeValueParm:
+      name: code_value
+      in: query
+      description: This parameter represents the code value being looked up. It is the value attached to the JSON key.
+      required: false
+      schema:
+        type: string
+    TableIdParm:
+      name: table_id
+      in: query
+      description: This parameter represents ID for one of the winery-maintained code tables in the AMS system.
+      required: false
+      schema:
+        title: TableIDEnum
+        x-tags:
+          - Enumeration
+        type: string
+        minLength: 3
+        maxLength: 3
+        enum:
+          - 7CL
+          - 7LN
+          - AAA
+          - ACE
+          - ACT
+          - ACW
+          - AGA
+          - AGC
+          - AGD
+          - AGM
+          - AGV
+          - ALC
+          - ANC
+          - AP9
+          - APC
+          - APE
+          - APG
+          - APH
+          - APL
+          - APM
+          - APS
+          - APT
+          - APV
+          - ARC
+          - ARD
+          - ARI
+          - ARL
+          - ARO
+          - ARP
+          - ARS
+          - ART
+          - AVR
+          - BBS
+          - BKR
+          - BLB
+          - BLS
+          - BRC
+          - BRN
+          - BSZ
+          - CAR
+          - CAT
+          - CCT
+          - CDZ
+          - CFC
+          - CGC
+          - CKA
+          - CLC
+          - CLK
+          - CLN
+          - CON
+          - COR
+          - COU
+          - CST
+          - CSZ
+          - CTC
+          - CTR
+          - CTT
+          - CTY
+          - CUS
+          - CZZ
+          - DAC
+          - DCX
+          - DCZ
+          - DDR
+          - DGC
+          - DIV
+          - DLS
+          - DLZ
+          - DPT
+          - DRR
+          - DRT
+          - DZC
+          - DZF
+          - DZP
+          - EBC
+          - ECA
+          - ECC
+          - EDI
+          - EMT
+          - ETE
+          - ETP
+          - ETX
+          - FGH
+          - FTT
+          - GGA
+          - GL1
+          - GLP
+          - GRP
+          - INU
+          - IR7
+          - IRC
+          - IRM
+          - IRS
+          - ITC
+          - ITE
+          - LAH
+          - LAL
+          - LAT
+          - LBC
+          - LBL
+          - LCR
+          - LEM
+          - LIC
+          - LM1
+          - LM2
+          - LM3
+          - LOC
+          - LTS
+          - LTT
+          - MBC
+          - MFG
+          - MKT
+          - MLC
+          - MRT
+          - NVC
+          - O3P
+          - OCD
+          - ODS
+          - OEC
+          - OEH
+          - OGC
+          - OHT
+          - OLS
+          - OPK
+          - OPM
+          - OPT
+          - ORT
+          - OST
+          - OTP
+          - PAC
+          - PAG
+          - PAR
+          - PCH
+          - PCM
+          - PCR
+          - PCS
+          - PDG
+          - PDL
+          - PDT
+          - PFC
+          - PGB
+          - PKG
+          - PPC
+          - PPP
+          - PRC
+          - PRS
+          - PRT
+          - PS1
+          - PSC
+          - RAC
+          - RAN
+          - RCC
+          - RCH
+          - REF
+          - REG
+          - REM
+          - RFT
+          - RGN
+          - RLT
+          - ROL
+          - RSC
+          - RTS
+          - SAT
+          - SCA
+          - SCC
+          - SCT
+          - SGA
+          - SHP
+          - SKU
+          - SMN
+          - SPC
+          - SPH
+          - SPR
+          - SPT
+          - STA
+          - STC
+          - STD
+          - STF
+          - STX
+          - SUM
+          - TAC
+          - TAK
+          - TAX
+          - TBC
+          - TCC
+          - TCF
+          - TCT
+          - TCX
+          - TIR
+          - TMM
+          - TPC
+          - TPT
+          - TRE
+          - TRL
+          - TRM
+          - TRR
+          - TRT
+          - TTC
+          - TTT
+          - TTX
+          - TWC
+          - TWP
+          - TWT
+          - UDC
+          - UOM
+          - VAR
+          - VPH
+          - VSP
+          - WHS
+          - WIN
+          - YRS
+          - ZZZ
+        example: APL
+  responses:
+    200SuccessfulV1CodeInfoGet:
+      description: Ok - The GET against the code_info resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      code_info:
+                        type: object
+                        properties:
+                          table_id:
+                            title: TableIDEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            minLength: 3
+                            maxLength: 3
+                            enum:
+                              - 7CL
+                              - 7LN
+                              - AAA
+                              - ACE
+                              - ACT
+                              - ACW
+                              - AGA
+                              - AGC
+                              - AGD
+                              - AGM
+                              - AGV
+                              - ALC
+                              - ANC
+                              - AP9
+                              - APC
+                              - APE
+                              - APG
+                              - APH
+                              - APL
+                              - APM
+                              - APS
+                              - APT
+                              - APV
+                              - ARC
+                              - ARD
+                              - ARI
+                              - ARL
+                              - ARO
+                              - ARP
+                              - ARS
+                              - ART
+                              - AVR
+                              - BBS
+                              - BKR
+                              - BLB
+                              - BLS
+                              - BRC
+                              - BRN
+                              - BSZ
+                              - CAR
+                              - CAT
+                              - CCT
+                              - CDZ
+                              - CFC
+                              - CGC
+                              - CKA
+                              - CLC
+                              - CLK
+                              - CLN
+                              - CON
+                              - COR
+                              - COU
+                              - CST
+                              - CSZ
+                              - CTC
+                              - CTR
+                              - CTT
+                              - CTY
+                              - CUS
+                              - CZZ
+                              - DAC
+                              - DCX
+                              - DCZ
+                              - DDR
+                              - DGC
+                              - DIV
+                              - DLS
+                              - DLZ
+                              - DPT
+                              - DRR
+                              - DRT
+                              - DZC
+                              - DZF
+                              - DZP
+                              - EBC
+                              - ECA
+                              - ECC
+                              - EDI
+                              - EMT
+                              - ETE
+                              - ETP
+                              - ETX
+                              - FGH
+                              - FTT
+                              - GGA
+                              - GL1
+                              - GLP
+                              - GRP
+                              - INU
+                              - IR7
+                              - IRC
+                              - IRM
+                              - IRS
+                              - ITC
+                              - ITE
+                              - LAH
+                              - LAL
+                              - LAT
+                              - LBC
+                              - LBL
+                              - LCR
+                              - LEM
+                              - LIC
+                              - LM1
+                              - LM2
+                              - LM3
+                              - LOC
+                              - LTS
+                              - LTT
+                              - MBC
+                              - MFG
+                              - MKT
+                              - MLC
+                              - MRT
+                              - NVC
+                              - O3P
+                              - OCD
+                              - ODS
+                              - OEC
+                              - OEH
+                              - OGC
+                              - OHT
+                              - OLS
+                              - OPK
+                              - OPM
+                              - OPT
+                              - ORT
+                              - OST
+                              - OTP
+                              - PAC
+                              - PAG
+                              - PAR
+                              - PCH
+                              - PCM
+                              - PCR
+                              - PCS
+                              - PDG
+                              - PDL
+                              - PDT
+                              - PFC
+                              - PGB
+                              - PKG
+                              - PPC
+                              - PPP
+                              - PRC
+                              - PRS
+                              - PRT
+                              - PS1
+                              - PSC
+                              - RAC
+                              - RAN
+                              - RCC
+                              - RCH
+                              - REF
+                              - REG
+                              - REM
+                              - RFT
+                              - RGN
+                              - RLT
+                              - ROL
+                              - RSC
+                              - RTS
+                              - SAT
+                              - SCA
+                              - SCC
+                              - SCT
+                              - SGA
+                              - SHP
+                              - SKU
+                              - SMN
+                              - SPC
+                              - SPH
+                              - SPR
+                              - SPT
+                              - STA
+                              - STC
+                              - STD
+                              - STF
+                              - STX
+                              - SUM
+                              - TAC
+                              - TAK
+                              - TAX
+                              - TBC
+                              - TCC
+                              - TCF
+                              - TCT
+                              - TCX
+                              - TIR
+                              - TMM
+                              - TPC
+                              - TPT
+                              - TRE
+                              - TRL
+                              - TRM
+                              - TRR
+                              - TRT
+                              - TTC
+                              - TTT
+                              - TTX
+                              - TWC
+                              - TWP
+                              - TWT
+                              - UDC
+                              - UOM
+                              - VAR
+                              - VPH
+                              - VSP
+                              - WHS
+                              - WIN
+                              - YRS
+                              - ZZZ
+                            example: APL
+                          table_name:
+                            type: string
+                            maxLength: 40
+                            example: AP Ledger Code Table
+                          num_entries_returned:
+                            type: integer
+                            minimum: 0
+                            maximum: 999999999
+                            example: 23
+                          date_table_last_updated:
+                            type: string
+                            minLength: 10
+                            maxLength: 10
+                            example: 02/03/2020
+                          table_listing:
+                            type: array
+                            minItems: 0
+                            items:
+                              type: object
+                              properties:
+                                code:
+                                  type: string
+                                  maxLength: 20
+                                  example: '01'
+                                code_description:
+                                  type: string
+                                  maxLength: 60
+                                  example: Example Ledger Code
+    400BadParmsGetResponse:
+      description: The query parameters used in the query of the code_info endpoint were invalid.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Query Parameters Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      potential_query_parameters:
+                        title: PotentialQueryParms
+                        type: array
+                        minItems: 1
+                        items:
+                          anyOf:
+                            - title: QueryParm1Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: FIXED_STRING_PARM
+                                parameter_type:
+                                  type: string
+                                  example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                parameter_notes:
+                                  type: string
+                                  example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                            - title: QueryParm2Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: STRING_SEARCH_PARM
+                                parameter_type:
+                                  type: string
+                                  example: String search parameter (generally contains type text search)
+                                parameter_notes:
+                                  type: string
+                                  example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                            - title: QueryParm3Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: NUMERIC_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Numeric parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                            - title: QueryParm4Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: DATE_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Date parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+    401UnauthorizedResponse:
+      description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+      content:
+        application/json:
+          schema:
+            title: Unauthorized - Invalid/Missing Authorization GUID Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    type: string
+                    example: Invalid authorization GUID.
+    403ForbiddenResponse:
+      description: The API User does not have access to the requested resource.
+      content:
+        application/json:
+          schema:
+            title: Forbidden - Access Not Permitted Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                required:
+                  - error_state
+                  - error_msg
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    oneOf:
+                      - title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      - title: InvalidImpersonationGuidMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: Invalid Impersonation Guid
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        oneOf:
+                          - title: NoApiAccessMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the called method on the called resource.
+                          - title: AmsUserImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the GET method on the dtc_orders API resource
+                          - title: DtcCustImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+    404NotFoundResponse:
+      description: The requested API resource does not exist.
+      content:
+        application/json:
+          schema:
+            title: Not Found - Resource Does Not Exist Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        title: ResourceNotFoundMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: API resource with provided ID not found.
+  schemas:
+    V1GetCodeInfoListing:
+      type: object
+      properties:
+        table_id:
+          title: TableIDEnum
+          x-tags:
+            - Enumeration
+          type: string
+          minLength: 3
+          maxLength: 3
+          enum:
+            - 7CL
+            - 7LN
+            - AAA
+            - ACE
+            - ACT
+            - ACW
+            - AGA
+            - AGC
+            - AGD
+            - AGM
+            - AGV
+            - ALC
+            - ANC
+            - AP9
+            - APC
+            - APE
+            - APG
+            - APH
+            - APL
+            - APM
+            - APS
+            - APT
+            - APV
+            - ARC
+            - ARD
+            - ARI
+            - ARL
+            - ARO
+            - ARP
+            - ARS
+            - ART
+            - AVR
+            - BBS
+            - BKR
+            - BLB
+            - BLS
+            - BRC
+            - BRN
+            - BSZ
+            - CAR
+            - CAT
+            - CCT
+            - CDZ
+            - CFC
+            - CGC
+            - CKA
+            - CLC
+            - CLK
+            - CLN
+            - CON
+            - COR
+            - COU
+            - CST
+            - CSZ
+            - CTC
+            - CTR
+            - CTT
+            - CTY
+            - CUS
+            - CZZ
+            - DAC
+            - DCX
+            - DCZ
+            - DDR
+            - DGC
+            - DIV
+            - DLS
+            - DLZ
+            - DPT
+            - DRR
+            - DRT
+            - DZC
+            - DZF
+            - DZP
+            - EBC
+            - ECA
+            - ECC
+            - EDI
+            - EMT
+            - ETE
+            - ETP
+            - ETX
+            - FGH
+            - FTT
+            - GGA
+            - GL1
+            - GLP
+            - GRP
+            - INU
+            - IR7
+            - IRC
+            - IRM
+            - IRS
+            - ITC
+            - ITE
+            - LAH
+            - LAL
+            - LAT
+            - LBC
+            - LBL
+            - LCR
+            - LEM
+            - LIC
+            - LM1
+            - LM2
+            - LM3
+            - LOC
+            - LTS
+            - LTT
+            - MBC
+            - MFG
+            - MKT
+            - MLC
+            - MRT
+            - NVC
+            - O3P
+            - OCD
+            - ODS
+            - OEC
+            - OEH
+            - OGC
+            - OHT
+            - OLS
+            - OPK
+            - OPM
+            - OPT
+            - ORT
+            - OST
+            - OTP
+            - PAC
+            - PAG
+            - PAR
+            - PCH
+            - PCM
+            - PCR
+            - PCS
+            - PDG
+            - PDL
+            - PDT
+            - PFC
+            - PGB
+            - PKG
+            - PPC
+            - PPP
+            - PRC
+            - PRS
+            - PRT
+            - PS1
+            - PSC
+            - RAC
+            - RAN
+            - RCC
+            - RCH
+            - REF
+            - REG
+            - REM
+            - RFT
+            - RGN
+            - RLT
+            - ROL
+            - RSC
+            - RTS
+            - SAT
+            - SCA
+            - SCC
+            - SCT
+            - SGA
+            - SHP
+            - SKU
+            - SMN
+            - SPC
+            - SPH
+            - SPR
+            - SPT
+            - STA
+            - STC
+            - STD
+            - STF
+            - STX
+            - SUM
+            - TAC
+            - TAK
+            - TAX
+            - TBC
+            - TCC
+            - TCF
+            - TCT
+            - TCX
+            - TIR
+            - TMM
+            - TPC
+            - TPT
+            - TRE
+            - TRL
+            - TRM
+            - TRR
+            - TRT
+            - TTC
+            - TTT
+            - TTX
+            - TWC
+            - TWP
+            - TWT
+            - UDC
+            - UOM
+            - VAR
+            - VPH
+            - VSP
+            - WHS
+            - WIN
+            - YRS
+            - ZZZ
+          example: APL
+        table_name:
+          type: string
+          maxLength: 40
+          example: AP Ledger Code Table
+        num_entries_returned:
+          type: integer
+          minimum: 0
+          maximum: 999999999
+          example: 23
+        date_table_last_updated:
+          type: string
+          minLength: 10
+          maxLength: 10
+          example: 02/03/2020
+        table_listing:
+          type: array
+          minItems: 0
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                maxLength: 20
+                example: '01'
+              code_description:
+                type: string
+                maxLength: 60
+                example: Example Ledger Code
+    V1GetCodeInfoListingArray:
+      type: array
+      minItems: 0
+      items:
+        type: object
+        properties:
+          code:
+            type: string
+            maxLength: 20
+            example: '01'
+          code_description:
+            type: string
+            maxLength: 60
+            example: Example Ledger Code
+    V1GetCodeInfoListingObject:
+      type: object
+      properties:
+        code:
+          type: string
+          maxLength: 20
+          example: '01'
+        code_description:
+          type: string
+          maxLength: 60
+          example: Example Ledger Code

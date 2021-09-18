@@ -1,0 +1,3365 @@
+openapi: 3.0.0
+info:
+  title: V1 AMS Winery AP Batches API
+  description: |
+    RESTful API Access to the AMS AP Batch business object. This business object represents Batches of AP Invoices from  vendors of the winery, in other words invoices due to vendors for either services or goods provided to the winery.
+    <br/>
+    <h1>Version Control Scheme</h1>
+    <p>Versions will be relatively static, when breaking/logic changes occur a 
+    new version will be created.</p>
+    <hr/>
+    <h1>Revision Log</h1>
+    <ul>
+    <li>2019-05-28 - KAS - Brand new.</li>
+    <li>2020-12-29 - KAS - Trying to determine why the API can't be exported.</li>
+    <li>2021-09-15 - KAS - Clean up, re-organize a bit, and import into Stoplight Studio/ReadMe. This involves the introduction of 'model' files, rather than the 'domains' that SwaggerHub allows for.</li>
+    </ul>
+  contact:
+    name: Helpdesk API Support
+    email: apisupport@amssoftware.com
+  license:
+    name: License Required
+    url: 'http://www.amssoftware.com'
+  version: '2019-05-28'
+servers:
+  - description: Development Server
+    url: 'http://thor2012-test.amscloudconnect.amssoftware.com/api'
+security:
+  - AMSbearerAuth: []
+tags:
+  - name: ApBatchesGET
+    description: GETs to the API resource and collections that make up the representation of an AP Batch of Invoices.
+  - name: ApBatchesPOST
+    description: POSTs to the API resource and collections that make up the representation of an AP Batch of Invoices.
+  - name: ApBatchesDELETE
+    description: DELETEs to the API resource and collections that make up the representation of an AP Batch of Invoices.
+paths:
+  /winery/v1/ap_batches:
+    get:
+      operationId: obtainV1ApBatchId
+      tags:
+        - ApBatchesGET
+      summary: Obtains a new batch ID from the AMS system.
+      description: A GET to the ap_batches endpoint is the first step in the process of submitting AP invoices to the AMS system. The batch ID obtained is required for submitting invoices to an invoice entry/change batch of AP invoices. The BATCH_TYPE query parameter is required and determines the type of the batch represented by the returned batch id. The BATCH_DATE parameter is required and sets the batch date for the AP batch represented by the returned batch_id.
+      parameters:
+        - name: batch_type
+          in: query
+          description: 'The batch_type parameter is used to indicate the type of batch represented by the returned batch_id in a get against the ap_batches resource. The valid values for this parameter are INVOICE_ENTRY for a batch of new AP invoices, INVOICE_CHANGE for a change batch of AP invoices, and MANUAL_CHECK for a manual check batch.'
+          required: true
+          schema:
+            title: BatchTypeEnum
+            x-tags:
+              - Enumeration
+            type: string
+            maxLength: 15
+            enum:
+              - Invoice Entry
+              - Invoice Change
+              - Manual Check
+            example: Invoice Entry
+        - name: batch_date
+          in: query
+          description: The batch_date parameter is used to indicate the date used to create the AP batch represented by the returned batch_id in a get against the ap_batches resource. The value provided must be in the MMDDYYYY format.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok - The GET against the ap_batches was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              batch_return:
+                                type: object
+                                properties:
+                                  batch_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 05/28/2019
+                                  batch_id:
+                                    type: string
+                                    maxLength: 8
+                                    example: 052919KS
+        '400':
+          description: The query parameters used in the query of the ap_batches endpoint were invalid.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Query Parameters Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          potential_query_parameters:
+                            title: PotentialQueryParms
+                            type: array
+                            minItems: 1
+                            items:
+                              anyOf:
+                                - title: QueryParm1Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: FIXED_STRING_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                    parameter_notes:
+                                      type: string
+                                      example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                                - title: QueryParm2Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: STRING_SEARCH_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: String search parameter (generally contains type text search)
+                                    parameter_notes:
+                                      type: string
+                                      example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                                - title: QueryParm3Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: NUMERIC_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Numeric parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                                - title: QueryParm4Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: DATE_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Date parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+  '/winery/ap_batches/{batch_id}':
+    parameters:
+      - name: batch_id
+        in: path
+        description: batch_id is a unique identifier for an ap_batch of invoices.
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+    get:
+      operationId: getV1ApBatch
+      tags:
+        - ApBatchesGET
+      summary: Obtains a specific ap_batch resource.
+      description: A GET to the ap_batches endpoint with a specific batch_id returns the ap_batch resource and its associated invoice information.
+      responses:
+        '200':
+          description: Ok - The GET against a specific ap_batch was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              ap_batch:
+                                title: V1GETApBatchObject
+                                type: object
+                                properties:
+                                  apl_ledger_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: '01'
+                                  batch_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 05/28/2019
+                                  batch_id:
+                                    type: string
+                                    maxLength: 8
+                                    example: 052919KS
+                                  batch_type:
+                                    title: BatchTypeEnum
+                                    x-tags:
+                                      - Enumeration
+                                    type: string
+                                    maxLength: 15
+                                    enum:
+                                      - Invoice Entry
+                                      - Invoice Change
+                                      - Manual Check
+                                    example: Invoice Entry
+                                  batch_status:
+                                    type: string
+                                    maxLength: 14
+                                    example: In Process
+                                  cka_checking_account_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: '01'
+                                  invoice_gross_total:
+                                    type: number
+                                    minimum: -999999999.99
+                                    maximum: 999999999.99
+                                    example: 1235.84
+                                  invoices:
+                                    type: array
+                                    items:
+                                      title: V1GETBatchInvoiceObject
+                                      type: object
+                                      properties:
+                                        amount:
+                                          type: number
+                                          minimum: -999999999.99
+                                          maximum: 999999999.99
+                                          example: 1235.84
+                                        apl_ledger_code:
+                                          type: string
+                                          maxLength: 2
+                                          example: '01'
+                                        description:
+                                          type: string
+                                          maxLength: 30
+                                          example: Party catering services
+                                        discount_amount:
+                                          type: number
+                                          minimum: -999999999.99
+                                          maximum: 999999999.99
+                                          example: 50
+                                        discount_due_date:
+                                          type: string
+                                          maxLength: 10
+                                          example: 12/20/2018
+                                        due_date:
+                                          type: string
+                                          maxLength: 10
+                                          example: 12/31/2018
+                                        invoice_date:
+                                          type: string
+                                          maxLength: 10
+                                          example: 12/15/2018
+                                        invoice_id:
+                                          type: string
+                                          maxLength: 20
+                                          example: '123456789'
+                                        new_invoice_flag:
+                                          type: boolean
+                                          example: true
+                                        num_distribution_accounts:
+                                          type: integer
+                                          minimum: 0
+                                          maximum: 9999
+                                          example: 2
+                                        payment_type:
+                                          type: string
+                                          maxLength: 30
+                                          example: Printed
+                                        reference_number:
+                                          type: string
+                                          maxLength: 10
+                                          example: '654321'
+                                        sequence_number:
+                                          type: integer
+                                          minimum: 1
+                                          maximum: 9999
+                                          example: 1
+                                        vendor_id:
+                                          type: integer
+                                          minimum: 1
+                                          maximum: 999999
+                                          example: 1234
+                                        voucher_number:
+                                          type: number
+                                          minimum: 0
+                                          maximum: 99999.9
+                                          example: 123.4
+                                        wfpm_epay_type:
+                                          type: string
+                                          maxLength: 3
+                                          example: CCK
+                                        distribution_accounts:
+                                          type: array
+                                          items:
+                                            title: V1GETDistributionAccountObject
+                                            type: object
+                                            properties:
+                                              comment:
+                                                type: string
+                                                maxLength: 25
+                                                example: Account comment here.
+                                              distribution_percent:
+                                                type: number
+                                                minimum: 0.01
+                                                maximum: 100
+                                                example: 100
+                                              gl_account_number:
+                                                type: string
+                                                maxLength: 10
+                                                example: 11-213-51
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+    post:
+      operationId: addV1ApBatch
+      tags:
+        - ApBatchesPOST
+      summary: Finishes the creation of an Invoice Entry/Change Batch of AP Invoices.
+      description: This is the final step in the process of adding/changing a batch of AP Invoices. POSTing will indicate that the API user is done working on the batch. The batch will be closed once this is done.
+      responses:
+        '200':
+          description: Ok - The POST on the ap_batch was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          ap_batch:
+                            title: V1GETApBatchObject
+                            type: object
+                            properties:
+                              apl_ledger_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              batch_date:
+                                type: string
+                                maxLength: 10
+                                example: 05/28/2019
+                              batch_id:
+                                type: string
+                                maxLength: 8
+                                example: 052919KS
+                              batch_type:
+                                title: BatchTypeEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 15
+                                enum:
+                                  - Invoice Entry
+                                  - Invoice Change
+                                  - Manual Check
+                                example: Invoice Entry
+                              batch_status:
+                                type: string
+                                maxLength: 14
+                                example: In Process
+                              cka_checking_account_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              invoice_gross_total:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 1235.84
+                              invoices:
+                                type: array
+                                items:
+                                  title: V1GETBatchInvoiceObject
+                                  type: object
+                                  properties:
+                                    amount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 1235.84
+                                    apl_ledger_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: '01'
+                                    description:
+                                      type: string
+                                      maxLength: 30
+                                      example: Party catering services
+                                    discount_amount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 50
+                                    discount_due_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/20/2018
+                                    due_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/31/2018
+                                    invoice_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/15/2018
+                                    invoice_id:
+                                      type: string
+                                      maxLength: 20
+                                      example: '123456789'
+                                    new_invoice_flag:
+                                      type: boolean
+                                      example: true
+                                    num_distribution_accounts:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 9999
+                                      example: 2
+                                    payment_type:
+                                      type: string
+                                      maxLength: 30
+                                      example: Printed
+                                    reference_number:
+                                      type: string
+                                      maxLength: 10
+                                      example: '654321'
+                                    sequence_number:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 9999
+                                      example: 1
+                                    vendor_id:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 999999
+                                      example: 1234
+                                    voucher_number:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 99999.9
+                                      example: 123.4
+                                    wfpm_epay_type:
+                                      type: string
+                                      maxLength: 3
+                                      example: CCK
+                                    distribution_accounts:
+                                      type: array
+                                      items:
+                                        title: V1GETDistributionAccountObject
+                                        type: object
+                                        properties:
+                                          comment:
+                                            type: string
+                                            maxLength: 25
+                                            example: Account comment here.
+                                          distribution_percent:
+                                            type: number
+                                            minimum: 0.01
+                                            maximum: 100
+                                            example: 100
+                                          gl_account_number:
+                                            type: string
+                                            maxLength: 10
+                                            example: 11-213-51
+        '400':
+          description: The JSON body used in the POST request is invalid or one of the property values failed validation. Information will be provided indicating how to correct the issue.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Post Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        oneOf:
+                          - title: PropertyDataErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: There were validation errors with the JSON data passed in. See below array for error messages.
+                              property_data_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    property_data_error:
+                                      type: string
+                                      example: I have a problem with one of the property values that was passed in.
+                          - title: JsonValidationErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                              json_validation_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    json_validation_error:
+                                      type: string
+                                      example: I have a problem with the structure of the passed in JSON.
+                              example_object:
+                                title: ExampleObject
+                                type: object
+                                properties:
+                                  object_property_1:
+                                    type: string
+                                    example: Required string property; Maximum Length = 30; Object description.
+                                  object_property_2:
+                                    type: string
+                                    example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                                  object_property_3:
+                                    type: string
+                                    example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+  '/winery/ap_batches/{batch_id}/invoices':
+    parameters:
+      - name: batch_id
+        in: path
+        description: batch_id is a unique identifier for an ap_batch of invoices.
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+    get:
+      operationId: getV1ApBatchInvoices
+      tags:
+        - ApBatchesGET
+      summary: Obtains collection of invoices in the ap_batch.
+      description: A GET to the invoices endpoint with a specific batch_id obtains the collection of invoices that belong to the batch in question.
+      responses:
+        '200':
+          description: Ok - The GET against the array of invoices in a specific ap_batch was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              invoices:
+                                type: array
+                                items:
+                                  title: V1GETBatchInvoiceObject
+                                  type: object
+                                  properties:
+                                    amount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 1235.84
+                                    apl_ledger_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: '01'
+                                    description:
+                                      type: string
+                                      maxLength: 30
+                                      example: Party catering services
+                                    discount_amount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 50
+                                    discount_due_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/20/2018
+                                    due_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/31/2018
+                                    invoice_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/15/2018
+                                    invoice_id:
+                                      type: string
+                                      maxLength: 20
+                                      example: '123456789'
+                                    new_invoice_flag:
+                                      type: boolean
+                                      example: true
+                                    num_distribution_accounts:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 9999
+                                      example: 2
+                                    payment_type:
+                                      type: string
+                                      maxLength: 30
+                                      example: Printed
+                                    reference_number:
+                                      type: string
+                                      maxLength: 10
+                                      example: '654321'
+                                    sequence_number:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 9999
+                                      example: 1
+                                    vendor_id:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 999999
+                                      example: 1234
+                                    voucher_number:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 99999.9
+                                      example: 123.4
+                                    wfpm_epay_type:
+                                      type: string
+                                      maxLength: 3
+                                      example: CCK
+                                    distribution_accounts:
+                                      type: array
+                                      items:
+                                        title: V1GETDistributionAccountObject
+                                        type: object
+                                        properties:
+                                          comment:
+                                            type: string
+                                            maxLength: 25
+                                            example: Account comment here.
+                                          distribution_percent:
+                                            type: number
+                                            minimum: 0.01
+                                            maximum: 100
+                                            example: 100
+                                          gl_account_number:
+                                            type: string
+                                            maxLength: 10
+                                            example: 11-213-51
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+    post:
+      operationId: addV1ApBatchInvoice
+      tags:
+        - ApBatchesPOST
+      summary: Adds an invoice to the batch specified by batch_id.
+      description: A post to the invoices collection belonging to an AP batch adds an invoice to the collection.
+      requestBody:
+        description: Request body for posting an invoice to the ap_batch resource being worked with. All components of the object are required to be present. Components with a non-zero minimum length require a value.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - amount
+                - apl_ledger_code
+                - description
+                - discount_amount
+                - discount_due_date
+                - due_date
+                - invoice_date
+                - invoice_id
+                - payment_type
+                - reference_number
+                - vendor_id
+                - voucher_number
+                - wfpm_epay_type
+                - distribution_accounts
+              properties:
+                amount:
+                  type: number
+                  minimum: -999999999.99
+                  maximum: 999999999.99
+                  example: 1235.84
+                apl_ledger_code:
+                  type: string
+                  minLength: 1
+                  maxLength: 2
+                  example: '01'
+                description:
+                  type: string
+                  minLength: 1
+                  maxLength: 30
+                  example: Party catering services
+                discount_amount:
+                  type: number
+                  minimum: -999999999.99
+                  maximum: 999999999.99
+                  example: 50
+                discount_due_date:
+                  type: string
+                  maxLength: 10
+                  example: 12/20/2018
+                due_date:
+                  type: string
+                  minLength: 10
+                  maxLength: 10
+                  example: 12/31/2018
+                invoice_date:
+                  type: string
+                  minLength: 10
+                  maxLength: 10
+                  example: 12/15/2018
+                invoice_id:
+                  type: string
+                  minLength: 1
+                  maxLength: 20
+                  example: '123456789'
+                payment_type:
+                  type: string
+                  maxLength: 30
+                  example: Printed
+                reference_number:
+                  type: string
+                  maxLength: 10
+                  example: '654321'
+                vendor_id:
+                  type: integer
+                  minimum: 1
+                  maximum: 999999
+                  example: 1234
+                voucher_number:
+                  type: number
+                  minimum: 0
+                  maximum: 99999.9
+                  example: 123.4
+                wfpm_epay_type:
+                  type: string
+                  maxLength: 3
+                  example: CCK
+                distribution_accounts:
+                  type: array
+                  minItems: 1
+                  maxItems: 99
+                  items:
+                    type: object
+                    required:
+                      - comment
+                      - distribution_percent
+                      - gl_account_number
+                    properties:
+                      comment:
+                        type: string
+                        minLength: 0
+                        maxLength: 25
+                        example: Account comment here.
+                      distribution_percent:
+                        type: number
+                        minimum: 0.01
+                        maximum: 100
+                        example: 100
+                      gl_account_number:
+                        type: string
+                        minLength: 2
+                        maxLength: 10
+                        example: 10-100
+      responses:
+        '200':
+          description: Ok - The POST of an invoice to the ap_batches invoices collection was successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          invoice:
+                            title: V1GETBatchInvoiceObject
+                            type: object
+                            properties:
+                              amount:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 1235.84
+                              apl_ledger_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              description:
+                                type: string
+                                maxLength: 30
+                                example: Party catering services
+                              discount_amount:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 50
+                              discount_due_date:
+                                type: string
+                                maxLength: 10
+                                example: 12/20/2018
+                              due_date:
+                                type: string
+                                maxLength: 10
+                                example: 12/31/2018
+                              invoice_date:
+                                type: string
+                                maxLength: 10
+                                example: 12/15/2018
+                              invoice_id:
+                                type: string
+                                maxLength: 20
+                                example: '123456789'
+                              new_invoice_flag:
+                                type: boolean
+                                example: true
+                              num_distribution_accounts:
+                                type: integer
+                                minimum: 0
+                                maximum: 9999
+                                example: 2
+                              payment_type:
+                                type: string
+                                maxLength: 30
+                                example: Printed
+                              reference_number:
+                                type: string
+                                maxLength: 10
+                                example: '654321'
+                              sequence_number:
+                                type: integer
+                                minimum: 1
+                                maximum: 9999
+                                example: 1
+                              vendor_id:
+                                type: integer
+                                minimum: 1
+                                maximum: 999999
+                                example: 1234
+                              voucher_number:
+                                type: number
+                                minimum: 0
+                                maximum: 99999.9
+                                example: 123.4
+                              wfpm_epay_type:
+                                type: string
+                                maxLength: 3
+                                example: CCK
+                              distribution_accounts:
+                                type: array
+                                items:
+                                  title: V1GETDistributionAccountObject
+                                  type: object
+                                  properties:
+                                    comment:
+                                      type: string
+                                      maxLength: 25
+                                      example: Account comment here.
+                                    distribution_percent:
+                                      type: number
+                                      minimum: 0.01
+                                      maximum: 100
+                                      example: 100
+                                    gl_account_number:
+                                      type: string
+                                      maxLength: 10
+                                      example: 11-213-51
+        '400':
+          description: The JSON body used in the POST request is invalid or one of the property values failed validation. Information will be provided indicating how to correct the issue.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Post Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        oneOf:
+                          - title: PropertyDataErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: There were validation errors with the JSON data passed in. See below array for error messages.
+                              property_data_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    property_data_error:
+                                      type: string
+                                      example: I have a problem with one of the property values that was passed in.
+                          - title: JsonValidationErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                              json_validation_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    json_validation_error:
+                                      type: string
+                                      example: I have a problem with the structure of the passed in JSON.
+                              example_object:
+                                title: ExampleObject
+                                type: object
+                                properties:
+                                  object_property_1:
+                                    type: string
+                                    example: Required string property; Maximum Length = 30; Object description.
+                                  object_property_2:
+                                    type: string
+                                    example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                                  object_property_3:
+                                    type: string
+                                    example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+  '/winery/ap_batches/{batch_id}/invoices/{invoice_id}':
+    parameters:
+      - name: batch_id
+        in: path
+        description: batch_id is a unique identifier for an ap_batch of invoices.
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+      - name: invoice_id
+        in: path
+        description: invoice_id is a unique identifier for an invoice in an ap_batch.
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+    get:
+      operationId: getApBatchInvoice
+      tags:
+        - ApBatchesGET
+      summary: Obtains specific invoice from ap_batch.
+      description: A GET to the invoices collection with a specific invoice_id obtains a particular invoice resource associated with the specified ap_batch.
+      responses:
+        '200':
+          description: Ok - The GET against an invoice in a specific ap_batch was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              invoice:
+                                title: V1GETBatchInvoiceObject
+                                type: object
+                                properties:
+                                  amount:
+                                    type: number
+                                    minimum: -999999999.99
+                                    maximum: 999999999.99
+                                    example: 1235.84
+                                  apl_ledger_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: '01'
+                                  description:
+                                    type: string
+                                    maxLength: 30
+                                    example: Party catering services
+                                  discount_amount:
+                                    type: number
+                                    minimum: -999999999.99
+                                    maximum: 999999999.99
+                                    example: 50
+                                  discount_due_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 12/20/2018
+                                  due_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 12/31/2018
+                                  invoice_date:
+                                    type: string
+                                    maxLength: 10
+                                    example: 12/15/2018
+                                  invoice_id:
+                                    type: string
+                                    maxLength: 20
+                                    example: '123456789'
+                                  new_invoice_flag:
+                                    type: boolean
+                                    example: true
+                                  num_distribution_accounts:
+                                    type: integer
+                                    minimum: 0
+                                    maximum: 9999
+                                    example: 2
+                                  payment_type:
+                                    type: string
+                                    maxLength: 30
+                                    example: Printed
+                                  reference_number:
+                                    type: string
+                                    maxLength: 10
+                                    example: '654321'
+                                  sequence_number:
+                                    type: integer
+                                    minimum: 1
+                                    maximum: 9999
+                                    example: 1
+                                  vendor_id:
+                                    type: integer
+                                    minimum: 1
+                                    maximum: 999999
+                                    example: 1234
+                                  voucher_number:
+                                    type: number
+                                    minimum: 0
+                                    maximum: 99999.9
+                                    example: 123.4
+                                  wfpm_epay_type:
+                                    type: string
+                                    maxLength: 3
+                                    example: CCK
+                                  distribution_accounts:
+                                    type: array
+                                    items:
+                                      title: V1GETDistributionAccountObject
+                                      type: object
+                                      properties:
+                                        comment:
+                                          type: string
+                                          maxLength: 25
+                                          example: Account comment here.
+                                        distribution_percent:
+                                          type: number
+                                          minimum: 0.01
+                                          maximum: 100
+                                          example: 100
+                                        gl_account_number:
+                                          type: string
+                                          maxLength: 10
+                                          example: 11-213-51
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+    delete:
+      operationId: deleteApBatchInvoice
+      tags:
+        - ApBatchesDELETE
+      summary: Delete an AP invoice batch.
+      description: A DELETE to the invoices collection with a specific invoice_id obtains a particular invoice resource associated with the specified ap_batch.
+      responses:
+        '200':
+          description: Ok - The DELETE on a specific ap_batch was successful.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+  '/winery/ap_batches/{batch_id}/invoices/{invoice_id}/distribution_accounts':
+    parameters:
+      - name: batch_id
+        in: path
+        description: batch_id is a unique identifier for an ap_batch of invoices.
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+      - name: invoice_id
+        in: path
+        description: invoice_id is a unique identifier for an invoice in an ap_batch.
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+    get:
+      operationId: getV1ApBatchInvoiceDistAcnts
+      tags:
+        - ApBatchesGET
+      summary: Obtains distribution_accounts from an invoice in the ap_batch.
+      description: A GET to the distribution_accounts collection on an invoice associated with and ap_batch returns a collection of the GL account distributions for the invoice.
+      responses:
+        '200':
+          description: Ok - The GET against the distribution accounts on an invoice in a specific ap_batch was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              distribution_accounts:
+                                type: array
+                                items:
+                                  title: V1GETDistributionAccountObject
+                                  type: object
+                                  properties:
+                                    comment:
+                                      type: string
+                                      maxLength: 25
+                                      example: Account comment here.
+                                    distribution_percent:
+                                      type: number
+                                      minimum: 0.01
+                                      maximum: 100
+                                      example: 100
+                                    gl_account_number:
+                                      type: string
+                                      maxLength: 10
+                                      example: 11-213-51
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+components:
+  securitySchemes:
+    AMSbearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    BatchTypeQueryParm:
+      name: batch_type
+      in: query
+      description: 'The batch_type parameter is used to indicate the type of batch represented by the returned batch_id in a get against the ap_batches resource. The valid values for this parameter are INVOICE_ENTRY for a batch of new AP invoices, INVOICE_CHANGE for a change batch of AP invoices, and MANUAL_CHECK for a manual check batch.'
+      required: true
+      schema:
+        title: BatchTypeEnum
+        x-tags:
+          - Enumeration
+        type: string
+        maxLength: 15
+        enum:
+          - Invoice Entry
+          - Invoice Change
+          - Manual Check
+        example: Invoice Entry
+    BatchDateQueryParm:
+      name: batch_date
+      in: query
+      description: The batch_date parameter is used to indicate the date used to create the AP batch represented by the returned batch_id in a get against the ap_batches resource. The value provided must be in the MMDDYYYY format.
+      required: true
+      schema:
+        type: string
+    BatchIdPathParm:
+      name: batch_id
+      in: path
+      description: batch_id is a unique identifier for an ap_batch of invoices.
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 999999
+    InvoiceIdPathParm:
+      name: invoice_id
+      in: path
+      description: invoice_id is a unique identifier for an invoice in an ap_batch.
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 999999
+  requestBodies:
+    V1BatchInvoicePostRequestBody:
+      description: Request body for posting an invoice to the ap_batch resource being worked with. All components of the object are required to be present. Components with a non-zero minimum length require a value.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - amount
+              - apl_ledger_code
+              - description
+              - discount_amount
+              - discount_due_date
+              - due_date
+              - invoice_date
+              - invoice_id
+              - payment_type
+              - reference_number
+              - vendor_id
+              - voucher_number
+              - wfpm_epay_type
+              - distribution_accounts
+            properties:
+              amount:
+                type: number
+                minimum: -999999999.99
+                maximum: 999999999.99
+                example: 1235.84
+              apl_ledger_code:
+                type: string
+                minLength: 1
+                maxLength: 2
+                example: '01'
+              description:
+                type: string
+                minLength: 1
+                maxLength: 30
+                example: Party catering services
+              discount_amount:
+                type: number
+                minimum: -999999999.99
+                maximum: 999999999.99
+                example: 50
+              discount_due_date:
+                type: string
+                maxLength: 10
+                example: 12/20/2018
+              due_date:
+                type: string
+                minLength: 10
+                maxLength: 10
+                example: 12/31/2018
+              invoice_date:
+                type: string
+                minLength: 10
+                maxLength: 10
+                example: 12/15/2018
+              invoice_id:
+                type: string
+                minLength: 1
+                maxLength: 20
+                example: '123456789'
+              payment_type:
+                type: string
+                maxLength: 30
+                example: Printed
+              reference_number:
+                type: string
+                maxLength: 10
+                example: '654321'
+              vendor_id:
+                type: integer
+                minimum: 1
+                maximum: 999999
+                example: 1234
+              voucher_number:
+                type: number
+                minimum: 0
+                maximum: 99999.9
+                example: 123.4
+              wfpm_epay_type:
+                type: string
+                maxLength: 3
+                example: CCK
+              distribution_accounts:
+                type: array
+                minItems: 1
+                maxItems: 99
+                items:
+                  type: object
+                  required:
+                    - comment
+                    - distribution_percent
+                    - gl_account_number
+                  properties:
+                    comment:
+                      type: string
+                      minLength: 0
+                      maxLength: 25
+                      example: Account comment here.
+                    distribution_percent:
+                      type: number
+                      minimum: 0.01
+                      maximum: 100
+                      example: 100
+                    gl_account_number:
+                      type: string
+                      minLength: 2
+                      maxLength: 10
+                      example: 10-100
+  responses:
+    200SuccessfulV1BatchesGet:
+      description: Ok - The GET against the ap_batches was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          batch_return:
+                            type: object
+                            properties:
+                              batch_date:
+                                type: string
+                                maxLength: 10
+                                example: 05/28/2019
+                              batch_id:
+                                type: string
+                                maxLength: 8
+                                example: 052919KS
+    200SuccessfulV1BatchGet:
+      description: Ok - The GET against a specific ap_batch was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          ap_batch:
+                            title: V1GETApBatchObject
+                            type: object
+                            properties:
+                              apl_ledger_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              batch_date:
+                                type: string
+                                maxLength: 10
+                                example: 05/28/2019
+                              batch_id:
+                                type: string
+                                maxLength: 8
+                                example: 052919KS
+                              batch_type:
+                                title: BatchTypeEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 15
+                                enum:
+                                  - Invoice Entry
+                                  - Invoice Change
+                                  - Manual Check
+                                example: Invoice Entry
+                              batch_status:
+                                type: string
+                                maxLength: 14
+                                example: In Process
+                              cka_checking_account_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              invoice_gross_total:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 1235.84
+                              invoices:
+                                type: array
+                                items:
+                                  title: V1GETBatchInvoiceObject
+                                  type: object
+                                  properties:
+                                    amount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 1235.84
+                                    apl_ledger_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: '01'
+                                    description:
+                                      type: string
+                                      maxLength: 30
+                                      example: Party catering services
+                                    discount_amount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 50
+                                    discount_due_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/20/2018
+                                    due_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/31/2018
+                                    invoice_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/15/2018
+                                    invoice_id:
+                                      type: string
+                                      maxLength: 20
+                                      example: '123456789'
+                                    new_invoice_flag:
+                                      type: boolean
+                                      example: true
+                                    num_distribution_accounts:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 9999
+                                      example: 2
+                                    payment_type:
+                                      type: string
+                                      maxLength: 30
+                                      example: Printed
+                                    reference_number:
+                                      type: string
+                                      maxLength: 10
+                                      example: '654321'
+                                    sequence_number:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 9999
+                                      example: 1
+                                    vendor_id:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 999999
+                                      example: 1234
+                                    voucher_number:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 99999.9
+                                      example: 123.4
+                                    wfpm_epay_type:
+                                      type: string
+                                      maxLength: 3
+                                      example: CCK
+                                    distribution_accounts:
+                                      type: array
+                                      items:
+                                        title: V1GETDistributionAccountObject
+                                        type: object
+                                        properties:
+                                          comment:
+                                            type: string
+                                            maxLength: 25
+                                            example: Account comment here.
+                                          distribution_percent:
+                                            type: number
+                                            minimum: 0.01
+                                            maximum: 100
+                                            example: 100
+                                          gl_account_number:
+                                            type: string
+                                            maxLength: 10
+                                            example: 11-213-51
+    200SuccessfulV1BatchInvoicesGet:
+      description: Ok - The GET against the array of invoices in a specific ap_batch was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          invoices:
+                            type: array
+                            items:
+                              title: V1GETBatchInvoiceObject
+                              type: object
+                              properties:
+                                amount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 1235.84
+                                apl_ledger_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: '01'
+                                description:
+                                  type: string
+                                  maxLength: 30
+                                  example: Party catering services
+                                discount_amount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 50
+                                discount_due_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 12/20/2018
+                                due_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 12/31/2018
+                                invoice_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 12/15/2018
+                                invoice_id:
+                                  type: string
+                                  maxLength: 20
+                                  example: '123456789'
+                                new_invoice_flag:
+                                  type: boolean
+                                  example: true
+                                num_distribution_accounts:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 9999
+                                  example: 2
+                                payment_type:
+                                  type: string
+                                  maxLength: 30
+                                  example: Printed
+                                reference_number:
+                                  type: string
+                                  maxLength: 10
+                                  example: '654321'
+                                sequence_number:
+                                  type: integer
+                                  minimum: 1
+                                  maximum: 9999
+                                  example: 1
+                                vendor_id:
+                                  type: integer
+                                  minimum: 1
+                                  maximum: 999999
+                                  example: 1234
+                                voucher_number:
+                                  type: number
+                                  minimum: 0
+                                  maximum: 99999.9
+                                  example: 123.4
+                                wfpm_epay_type:
+                                  type: string
+                                  maxLength: 3
+                                  example: CCK
+                                distribution_accounts:
+                                  type: array
+                                  items:
+                                    title: V1GETDistributionAccountObject
+                                    type: object
+                                    properties:
+                                      comment:
+                                        type: string
+                                        maxLength: 25
+                                        example: Account comment here.
+                                      distribution_percent:
+                                        type: number
+                                        minimum: 0.01
+                                        maximum: 100
+                                        example: 100
+                                      gl_account_number:
+                                        type: string
+                                        maxLength: 10
+                                        example: 11-213-51
+    200SuccessfulV1BatchInvoiceGet:
+      description: Ok - The GET against an invoice in a specific ap_batch was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          invoice:
+                            title: V1GETBatchInvoiceObject
+                            type: object
+                            properties:
+                              amount:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 1235.84
+                              apl_ledger_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              description:
+                                type: string
+                                maxLength: 30
+                                example: Party catering services
+                              discount_amount:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 50
+                              discount_due_date:
+                                type: string
+                                maxLength: 10
+                                example: 12/20/2018
+                              due_date:
+                                type: string
+                                maxLength: 10
+                                example: 12/31/2018
+                              invoice_date:
+                                type: string
+                                maxLength: 10
+                                example: 12/15/2018
+                              invoice_id:
+                                type: string
+                                maxLength: 20
+                                example: '123456789'
+                              new_invoice_flag:
+                                type: boolean
+                                example: true
+                              num_distribution_accounts:
+                                type: integer
+                                minimum: 0
+                                maximum: 9999
+                                example: 2
+                              payment_type:
+                                type: string
+                                maxLength: 30
+                                example: Printed
+                              reference_number:
+                                type: string
+                                maxLength: 10
+                                example: '654321'
+                              sequence_number:
+                                type: integer
+                                minimum: 1
+                                maximum: 9999
+                                example: 1
+                              vendor_id:
+                                type: integer
+                                minimum: 1
+                                maximum: 999999
+                                example: 1234
+                              voucher_number:
+                                type: number
+                                minimum: 0
+                                maximum: 99999.9
+                                example: 123.4
+                              wfpm_epay_type:
+                                type: string
+                                maxLength: 3
+                                example: CCK
+                              distribution_accounts:
+                                type: array
+                                items:
+                                  title: V1GETDistributionAccountObject
+                                  type: object
+                                  properties:
+                                    comment:
+                                      type: string
+                                      maxLength: 25
+                                      example: Account comment here.
+                                    distribution_percent:
+                                      type: number
+                                      minimum: 0.01
+                                      maximum: 100
+                                      example: 100
+                                    gl_account_number:
+                                      type: string
+                                      maxLength: 10
+                                      example: 11-213-51
+    200SuccessfulV1DistributionAccountsGet:
+      description: Ok - The GET against the distribution accounts on an invoice in a specific ap_batch was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          distribution_accounts:
+                            type: array
+                            items:
+                              title: V1GETDistributionAccountObject
+                              type: object
+                              properties:
+                                comment:
+                                  type: string
+                                  maxLength: 25
+                                  example: Account comment here.
+                                distribution_percent:
+                                  type: number
+                                  minimum: 0.01
+                                  maximum: 100
+                                  example: 100
+                                gl_account_number:
+                                  type: string
+                                  maxLength: 10
+                                  example: 11-213-51
+    200SuccessfulV1BatchPost:
+      description: Ok - The POST on the ap_batch was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      ap_batch:
+                        title: V1GETApBatchObject
+                        type: object
+                        properties:
+                          apl_ledger_code:
+                            type: string
+                            maxLength: 2
+                            example: '01'
+                          batch_date:
+                            type: string
+                            maxLength: 10
+                            example: 05/28/2019
+                          batch_id:
+                            type: string
+                            maxLength: 8
+                            example: 052919KS
+                          batch_type:
+                            title: BatchTypeEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            maxLength: 15
+                            enum:
+                              - Invoice Entry
+                              - Invoice Change
+                              - Manual Check
+                            example: Invoice Entry
+                          batch_status:
+                            type: string
+                            maxLength: 14
+                            example: In Process
+                          cka_checking_account_code:
+                            type: string
+                            maxLength: 2
+                            example: '01'
+                          invoice_gross_total:
+                            type: number
+                            minimum: -999999999.99
+                            maximum: 999999999.99
+                            example: 1235.84
+                          invoices:
+                            type: array
+                            items:
+                              title: V1GETBatchInvoiceObject
+                              type: object
+                              properties:
+                                amount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 1235.84
+                                apl_ledger_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: '01'
+                                description:
+                                  type: string
+                                  maxLength: 30
+                                  example: Party catering services
+                                discount_amount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 50
+                                discount_due_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 12/20/2018
+                                due_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 12/31/2018
+                                invoice_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 12/15/2018
+                                invoice_id:
+                                  type: string
+                                  maxLength: 20
+                                  example: '123456789'
+                                new_invoice_flag:
+                                  type: boolean
+                                  example: true
+                                num_distribution_accounts:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 9999
+                                  example: 2
+                                payment_type:
+                                  type: string
+                                  maxLength: 30
+                                  example: Printed
+                                reference_number:
+                                  type: string
+                                  maxLength: 10
+                                  example: '654321'
+                                sequence_number:
+                                  type: integer
+                                  minimum: 1
+                                  maximum: 9999
+                                  example: 1
+                                vendor_id:
+                                  type: integer
+                                  minimum: 1
+                                  maximum: 999999
+                                  example: 1234
+                                voucher_number:
+                                  type: number
+                                  minimum: 0
+                                  maximum: 99999.9
+                                  example: 123.4
+                                wfpm_epay_type:
+                                  type: string
+                                  maxLength: 3
+                                  example: CCK
+                                distribution_accounts:
+                                  type: array
+                                  items:
+                                    title: V1GETDistributionAccountObject
+                                    type: object
+                                    properties:
+                                      comment:
+                                        type: string
+                                        maxLength: 25
+                                        example: Account comment here.
+                                      distribution_percent:
+                                        type: number
+                                        minimum: 0.01
+                                        maximum: 100
+                                        example: 100
+                                      gl_account_number:
+                                        type: string
+                                        maxLength: 10
+                                        example: 11-213-51
+    200SuccessfulV1BatchDelete:
+      description: Ok - The DELETE on a specific ap_batch was successful.
+    200SuccessfulV1BatchInvoicePost:
+      description: Ok - The POST of an invoice to the ap_batches invoices collection was successful
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      invoice:
+                        title: V1GETBatchInvoiceObject
+                        type: object
+                        properties:
+                          amount:
+                            type: number
+                            minimum: -999999999.99
+                            maximum: 999999999.99
+                            example: 1235.84
+                          apl_ledger_code:
+                            type: string
+                            maxLength: 2
+                            example: '01'
+                          description:
+                            type: string
+                            maxLength: 30
+                            example: Party catering services
+                          discount_amount:
+                            type: number
+                            minimum: -999999999.99
+                            maximum: 999999999.99
+                            example: 50
+                          discount_due_date:
+                            type: string
+                            maxLength: 10
+                            example: 12/20/2018
+                          due_date:
+                            type: string
+                            maxLength: 10
+                            example: 12/31/2018
+                          invoice_date:
+                            type: string
+                            maxLength: 10
+                            example: 12/15/2018
+                          invoice_id:
+                            type: string
+                            maxLength: 20
+                            example: '123456789'
+                          new_invoice_flag:
+                            type: boolean
+                            example: true
+                          num_distribution_accounts:
+                            type: integer
+                            minimum: 0
+                            maximum: 9999
+                            example: 2
+                          payment_type:
+                            type: string
+                            maxLength: 30
+                            example: Printed
+                          reference_number:
+                            type: string
+                            maxLength: 10
+                            example: '654321'
+                          sequence_number:
+                            type: integer
+                            minimum: 1
+                            maximum: 9999
+                            example: 1
+                          vendor_id:
+                            type: integer
+                            minimum: 1
+                            maximum: 999999
+                            example: 1234
+                          voucher_number:
+                            type: number
+                            minimum: 0
+                            maximum: 99999.9
+                            example: 123.4
+                          wfpm_epay_type:
+                            type: string
+                            maxLength: 3
+                            example: CCK
+                          distribution_accounts:
+                            type: array
+                            items:
+                              title: V1GETDistributionAccountObject
+                              type: object
+                              properties:
+                                comment:
+                                  type: string
+                                  maxLength: 25
+                                  example: Account comment here.
+                                distribution_percent:
+                                  type: number
+                                  minimum: 0.01
+                                  maximum: 100
+                                  example: 100
+                                gl_account_number:
+                                  type: string
+                                  maxLength: 10
+                                  example: 11-213-51
+    400BadParmsGetResponse:
+      description: The query parameters used in the query of the ap_batches endpoint were invalid.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Query Parameters Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      potential_query_parameters:
+                        title: PotentialQueryParms
+                        type: array
+                        minItems: 1
+                        items:
+                          anyOf:
+                            - title: QueryParm1Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: FIXED_STRING_PARM
+                                parameter_type:
+                                  type: string
+                                  example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                parameter_notes:
+                                  type: string
+                                  example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                            - title: QueryParm2Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: STRING_SEARCH_PARM
+                                parameter_type:
+                                  type: string
+                                  example: String search parameter (generally contains type text search)
+                                parameter_notes:
+                                  type: string
+                                  example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                            - title: QueryParm3Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: NUMERIC_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Numeric parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                            - title: QueryParm4Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: DATE_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Date parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+    400BadPostResponse:
+      description: The JSON body used in the POST request is invalid or one of the property values failed validation. Information will be provided indicating how to correct the issue.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Post Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    oneOf:
+                      - title: PropertyDataErrorResponse
+                        type: object
+                        properties:
+                          error_message:
+                            type: string
+                            example: There were validation errors with the JSON data passed in. See below array for error messages.
+                          property_data_errors:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              properties:
+                                property_data_error:
+                                  type: string
+                                  example: I have a problem with one of the property values that was passed in.
+                      - title: JsonValidationErrorResponse
+                        type: object
+                        properties:
+                          error_message:
+                            type: string
+                            example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                          json_validation_errors:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              properties:
+                                json_validation_error:
+                                  type: string
+                                  example: I have a problem with the structure of the passed in JSON.
+                          example_object:
+                            title: ExampleObject
+                            type: object
+                            properties:
+                              object_property_1:
+                                type: string
+                                example: Required string property; Maximum Length = 30; Object description.
+                              object_property_2:
+                                type: string
+                                example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                              object_property_3:
+                                type: string
+                                example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+    401UnauthorizedResponse:
+      description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+      content:
+        application/json:
+          schema:
+            title: Unauthorized - Invalid/Missing Authorization GUID Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    type: string
+                    example: Invalid authorization GUID.
+    403ForbiddenResponse:
+      description: The API User does not have access to the requested resource.
+      content:
+        application/json:
+          schema:
+            title: Forbidden - Access Not Permitted Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                required:
+                  - error_state
+                  - error_msg
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    oneOf:
+                      - title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      - title: InvalidImpersonationGuidMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: Invalid Impersonation Guid
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        oneOf:
+                          - title: NoApiAccessMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the called method on the called resource.
+                          - title: AmsUserImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the GET method on the dtc_orders API resource
+                          - title: DtcCustImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+    404NotFoundResponse:
+      description: The requested API resource does not exist.
+      content:
+        application/json:
+          schema:
+            title: Not Found - Resource Does Not Exist Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        title: ResourceNotFoundMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: API resource with provided ID not found.
+  schemas:
+    V1GetApBatchIdReturn:
+      type: object
+      properties:
+        batch_date:
+          type: string
+          maxLength: 10
+          example: 05/28/2019
+        batch_id:
+          type: string
+          maxLength: 8
+          example: 052919KS
+    V1GetBatchInvoicesArray:
+      type: array
+      items:
+        title: V1GETBatchInvoiceObject
+        type: object
+        properties:
+          amount:
+            type: number
+            minimum: -999999999.99
+            maximum: 999999999.99
+            example: 1235.84
+          apl_ledger_code:
+            type: string
+            maxLength: 2
+            example: '01'
+          description:
+            type: string
+            maxLength: 30
+            example: Party catering services
+          discount_amount:
+            type: number
+            minimum: -999999999.99
+            maximum: 999999999.99
+            example: 50
+          discount_due_date:
+            type: string
+            maxLength: 10
+            example: 12/20/2018
+          due_date:
+            type: string
+            maxLength: 10
+            example: 12/31/2018
+          invoice_date:
+            type: string
+            maxLength: 10
+            example: 12/15/2018
+          invoice_id:
+            type: string
+            maxLength: 20
+            example: '123456789'
+          new_invoice_flag:
+            type: boolean
+            example: true
+          num_distribution_accounts:
+            type: integer
+            minimum: 0
+            maximum: 9999
+            example: 2
+          payment_type:
+            type: string
+            maxLength: 30
+            example: Printed
+          reference_number:
+            type: string
+            maxLength: 10
+            example: '654321'
+          sequence_number:
+            type: integer
+            minimum: 1
+            maximum: 9999
+            example: 1
+          vendor_id:
+            type: integer
+            minimum: 1
+            maximum: 999999
+            example: 1234
+          voucher_number:
+            type: number
+            minimum: 0
+            maximum: 99999.9
+            example: 123.4
+          wfpm_epay_type:
+            type: string
+            maxLength: 3
+            example: CCK
+          distribution_accounts:
+            type: array
+            items:
+              title: V1GETDistributionAccountObject
+              type: object
+              properties:
+                comment:
+                  type: string
+                  maxLength: 25
+                  example: Account comment here.
+                distribution_percent:
+                  type: number
+                  minimum: 0.01
+                  maximum: 100
+                  example: 100
+                gl_account_number:
+                  type: string
+                  maxLength: 10
+                  example: 11-213-51
+    V1GetDistributionAccountsArray:
+      type: array
+      items:
+        title: V1GETDistributionAccountObject
+        type: object
+        properties:
+          comment:
+            type: string
+            maxLength: 25
+            example: Account comment here.
+          distribution_percent:
+            type: number
+            minimum: 0.01
+            maximum: 100
+            example: 100
+          gl_account_number:
+            type: string
+            maxLength: 10
+            example: 11-213-51
+    V1PostBatchInvoiceObject:
+      type: object
+      required:
+        - amount
+        - apl_ledger_code
+        - description
+        - discount_amount
+        - discount_due_date
+        - due_date
+        - invoice_date
+        - invoice_id
+        - payment_type
+        - reference_number
+        - vendor_id
+        - voucher_number
+        - wfpm_epay_type
+        - distribution_accounts
+      properties:
+        amount:
+          type: number
+          minimum: -999999999.99
+          maximum: 999999999.99
+          example: 1235.84
+        apl_ledger_code:
+          type: string
+          minLength: 1
+          maxLength: 2
+          example: '01'
+        description:
+          type: string
+          minLength: 1
+          maxLength: 30
+          example: Party catering services
+        discount_amount:
+          type: number
+          minimum: -999999999.99
+          maximum: 999999999.99
+          example: 50
+        discount_due_date:
+          type: string
+          maxLength: 10
+          example: 12/20/2018
+        due_date:
+          type: string
+          minLength: 10
+          maxLength: 10
+          example: 12/31/2018
+        invoice_date:
+          type: string
+          minLength: 10
+          maxLength: 10
+          example: 12/15/2018
+        invoice_id:
+          type: string
+          minLength: 1
+          maxLength: 20
+          example: '123456789'
+        payment_type:
+          type: string
+          maxLength: 30
+          example: Printed
+        reference_number:
+          type: string
+          maxLength: 10
+          example: '654321'
+        vendor_id:
+          type: integer
+          minimum: 1
+          maximum: 999999
+          example: 1234
+        voucher_number:
+          type: number
+          minimum: 0
+          maximum: 99999.9
+          example: 123.4
+        wfpm_epay_type:
+          type: string
+          maxLength: 3
+          example: CCK
+        distribution_accounts:
+          type: array
+          minItems: 1
+          maxItems: 99
+          items:
+            type: object
+            required:
+              - comment
+              - distribution_percent
+              - gl_account_number
+            properties:
+              comment:
+                type: string
+                minLength: 0
+                maxLength: 25
+                example: Account comment here.
+              distribution_percent:
+                type: number
+                minimum: 0.01
+                maximum: 100
+                example: 100
+              gl_account_number:
+                type: string
+                minLength: 2
+                maxLength: 10
+                example: 10-100
+    V1PostDistributionAccountsArray:
+      type: array
+      minItems: 1
+      maxItems: 99
+      items:
+        type: object
+        required:
+          - comment
+          - distribution_percent
+          - gl_account_number
+        properties:
+          comment:
+            type: string
+            minLength: 0
+            maxLength: 25
+            example: Account comment here.
+          distribution_percent:
+            type: number
+            minimum: 0.01
+            maximum: 100
+            example: 100
+          gl_account_number:
+            type: string
+            minLength: 2
+            maxLength: 10
+            example: 10-100
+    V1PostDistributionAccountObject:
+      type: object
+      required:
+        - comment
+        - distribution_percent
+        - gl_account_number
+      properties:
+        comment:
+          type: string
+          minLength: 0
+          maxLength: 25
+          example: Account comment here.
+        distribution_percent:
+          type: number
+          minimum: 0.01
+          maximum: 100
+          example: 100
+        gl_account_number:
+          type: string
+          minLength: 2
+          maxLength: 10
+          example: 10-100

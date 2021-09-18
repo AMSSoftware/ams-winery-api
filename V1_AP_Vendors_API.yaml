@@ -1,0 +1,3637 @@
+openapi: 3.0.0
+info:
+  title: V1 AMS Winery AP Vendor API
+  description: |
+    RESTful API Access to the AMS Winery Vendor business object. This business object represents a vendor of the winery, in other words as a payee of funds for either services or goods provided to the winery.
+    <br/>
+    <h1>Version Control Scheme</h1>
+    <p>Versions will be relatively static, when breaking/logic changes occur a new version will be created.</p>
+    <hr/>
+    <h1>Revision Log</h1>
+    <ul>
+    <li>2019-05-21 - KAS - Brand new.</li>
+    <li>2021-09-15 - KAS - Clean up, re-organize a bit, and import into Stoplight Studio/ReadMe. This involves the introduction of 'model' files, rather than the 'domains' that SwaggerHub allows for.</li>
+    </ul>
+  contact:
+    name: Helpdesk API Support
+    email: apisupport@amssoftware.com
+  license:
+    name: License Required
+    url: 'http://www.amssoftware.com'
+  version: '2019-05-21'
+servers:
+  - description: Development Server
+    url: 'https://thor2012-test.amscloudconnect.amssoftware.com/api'
+security:
+  - AMSBearerAuth: []
+tags:
+  - name: ApVendorsGET
+    description: GETs to the API resource and collections that make up the representation of a vendor to the winery.
+paths:
+  /winery/v1/vendors:
+    get:
+      operationId: getV1ApVendorQueryResults
+      tags:
+        - ApVendorsGET
+      summary: Searches the AP vendors in the winery's AMS database.
+      description: 'By passing in one or more of the appropriate options, an API consumer is able to query the AMS database of vendors to the winery. By default this endpoint limits query results to 500 vendors. If more vendors are found using the provided query parameters than are allowed, the response will indicate a subsequent request with further limiting parameters to ensure the result set has a size smaller than 500.'
+      parameters:
+        - name: name
+          in: query
+          description: Parameter value will be used to find customer accounts with an email containing the search string provided. The search methodology is of the contains type.
+          required: false
+          schema:
+            type: string
+        - name: detail
+          in: query
+          description: 'Flag indicating whether to include customer detail in results array; full customer objects vs. unique ID (customer number). By default, the results array will contain full customer objects. Valid value is ''NO''.'
+          required: false
+          schema:
+            type: string
+        - name: pagination
+          in: query
+          description: 'Query parameter that will allow for retrieving "pages" of results from the ap_vendors resource. The format of the value passed must be the following, {number1},{number2}. The first numeric value indicates the number of results per page and the second numeric value indicates the requested page of results.'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok - The query of the vendors resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              vendors_found:
+                                type: integer
+                                example: 1
+                              vendors:
+                                type: array
+                                items:
+                                  title: V1GETApVendorObject
+                                  type: object
+                                  properties:
+                                    vendor_id:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 999999
+                                      example: 1234
+                                    vendor_name:
+                                      type: string
+                                      maxLength: 30
+                                      example: Vendor ABC
+                                    sort_sequence_field:
+                                      type: string
+                                      maxLength: 6
+                                      example: ABC
+                                    apv_category_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: '02'
+                                    last_active_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 01/01/19
+                                    balance_due_to_vendor:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 1234.45
+                                    num_open_invoices:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 9999
+                                      example: 15
+                                    open_po_amount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 1234.45
+                                    open_po_count:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 9999
+                                      example: 12
+                                    wholesale_cust_num:
+                                      type: integer
+                                      minimum: 0
+                                      maximum: 9999
+                                      example: 100
+                                    minimum_check_amount:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 999999999.99
+                                      example: 50
+                                    one_time_vendor_flag:
+                                      type: boolean
+                                      example: false
+                                    setup_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 01/01/2018
+                                    setup_user:
+                                      type: string
+                                      maxLength: 8
+                                      example: GEORGE
+                                    one_invoice_per_check_flag:
+                                      type: boolean
+                                      example: false
+                                    apg_distribution_code:
+                                      type: string
+                                      maxLength: 4
+                                      example: TEST
+                                    apt_terms_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: NA
+                                    ap9_1099_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: 'NO'
+                                    aph_default_hold_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: NC
+                                    active_status:
+                                      title: VendorStatusEnum
+                                      x-tags:
+                                        - Enumeration
+                                      type: string
+                                      maxLength: 8
+                                      enum:
+                                        - Active
+                                        - Inactive
+                                      example: Inactive
+                                    inactivated_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 04/05/2018
+                                    federal_id_number:
+                                      type: string
+                                      maxLength: 12
+                                      example: 12-3456789
+                                    preferred_payment_type:
+                                      title: VendorPrefPaymentEnum
+                                      x-tags:
+                                        - Enumeration
+                                      type: string
+                                      maxLength: 13
+                                      enum:
+                                        - Printed check
+                                        - E-Pay
+                                        - ' '
+                                      example: E-Pay
+                                    apl_ledger_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: '01'
+                                    ape_edd_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: 'NO'
+                                    1099_name:
+                                      type: string
+                                      maxLength: 30
+                                      example: Joe Schmo
+                                    gl_distribution_account_num:
+                                      type: string
+                                      maxLength: 10
+                                      example: 11-110
+                                    invoices:
+                                      type: array
+                                      items:
+                                        title: V1GETInvoiceObject
+                                        type: object
+                                        properties:
+                                          invoice_id:
+                                            type: string
+                                            maxLength: 20
+                                            example: '123456789'
+                                          invoice_status:
+                                            title: InvoiceStatusEnum
+                                            x-tags:
+                                              - Enumeration
+                                            type: string
+                                            maxLength: 12
+                                            enum:
+                                              - Open
+                                              - Paid
+                                              - EqualOffset
+                                              - ' '
+                                            example: Open
+                                          invoice_type:
+                                            title: InvoiceTypeEnum
+                                            x-tags:
+                                              - Enumeration
+                                            type: string
+                                            maxLength: 11
+                                            enum:
+                                              - Invoice
+                                              - Credit Memo
+                                              - ' '
+                                            example: Invoice
+                                          beginning_ap_batch_date:
+                                            type: string
+                                            maxLength: 10
+                                            example: 01/01/2019
+                                          ending_ap_batch_date:
+                                            type: string
+                                            maxLength: 10
+                                            example: 02/01/2019
+                                          invoice_date:
+                                            type: string
+                                            maxLength: 10
+                                            example: 12/15/2018
+                                          description:
+                                            type: string
+                                            maxLength: 30
+                                            example: Party catering services
+                                          amount:
+                                            type: number
+                                            minimum: -999999999.99
+                                            maximum: 999999999.99
+                                            example: 1235.84
+                                          available_discount:
+                                            type: number
+                                            minimum: -999999999.99
+                                            maximum: 999999999.99
+                                            example: 500
+                                          used_discount:
+                                            type: number
+                                            minimum: -999999999.99
+                                            maximum: 999999999.99
+                                            example: 200
+                                          balance_due:
+                                            type: number
+                                            minimum: -999999999.99
+                                            maximum: 999999999.99
+                                            example: 1035.84
+                                          first_trans_date:
+                                            type: string
+                                            maxLength: 10
+                                            example: 01/12/2019
+                                          last_trans_date:
+                                            type: string
+                                            maxLength: 10
+                                            example: 01/20/2019
+                                          ftt_batch_form_type_code:
+                                            type: string
+                                            maxLength: 2
+                                            example: BN
+                                          ap9_1099_code:
+                                            type: string
+                                            maxLength: 2
+                                            example: 'NO'
+                                          voucher_number:
+                                            type: number
+                                            minimum: 0
+                                            maximum: 99999.9
+                                            example: 123.4
+                                          apl_ledger_code:
+                                            type: string
+                                            maxLength: 2
+                                            example: '01'
+                                          reference_number:
+                                            type: string
+                                            maxLength: 10
+                                            example: '654321'
+                                    epay_info:
+                                      title: V1GETEpayInfoObject
+                                      type: object
+                                      properties:
+                                        epay_account_type:
+                                          title: EpayAccountTypeEnum
+                                          x-tags:
+                                            - Enumeration
+                                          type: string
+                                          maxLength: 8
+                                          enum:
+                                            - Checking
+                                            - Savings
+                                            - ' '
+                                          example: Checking
+                                        epay_rdfi_account_number:
+                                          type: string
+                                          maxLength: 18
+                                          example: '12345678901234567'
+                                        epay_type:
+                                          type: string
+                                          maxLength: 3
+                                          example: CHK
+                                        cka_epay_account_code:
+                                          type: string
+                                          maxLength: 2
+                                          example: A1
+                                        standard_entry_class:
+                                          type: string
+                                          maxLength: 3
+                                          example: CTX
+                                        transit_routing_number:
+                                          type: string
+                                          maxLength: 10
+                                          example: '0'
+                                    ap_contact_info:
+                                      title: V1GETApContactInfoObject
+                                      type: object
+                                      properties:
+                                        street_address_1:
+                                          type: string
+                                          maxLength: 30
+                                          example: 123 Some St. NW
+                                        street_address_2:
+                                          type: string
+                                          maxLength: 30
+                                          example: Suite B
+                                        city:
+                                          type: string
+                                          maxLength: 24
+                                          example: Some City
+                                        state:
+                                          type: string
+                                          maxLength: 2
+                                          example: CA
+                                        zip_code:
+                                          type: string
+                                          maxLength: 10
+                                          example: '95404'
+                                        country_code:
+                                          type: string
+                                          maxLength: 3
+                                          example: USA
+                                        phone_number:
+                                          type: string
+                                          maxLength: 20
+                                          example: (555) 555-5555
+                                        fax_number:
+                                          type: string
+                                          maxLength: 20
+                                          example: (555) 555-5556
+                                        email_address:
+                                          type: string
+                                          maxLength: 60
+                                          example: business@email.com
+                                        name:
+                                          type: string
+                                          maxLength: 30
+                                          example: Angela X223
+                                    po_contact_info:
+                                      title: V1GETPoContactInfoObject
+                                      type: object
+                                      properties:
+                                        street_address_1:
+                                          type: string
+                                          maxLength: 30
+                                          example: 123 Some St. NW
+                                        street_address_2:
+                                          type: string
+                                          maxLength: 30
+                                          example: Suite B
+                                        city:
+                                          type: string
+                                          maxLength: 24
+                                          example: Some City
+                                        state:
+                                          type: string
+                                          maxLength: 2
+                                          example: CA
+                                        zip_code:
+                                          type: string
+                                          maxLength: 10
+                                          example: '95404'
+                                        phone_number:
+                                          type: string
+                                          maxLength: 20
+                                          example: (555) 555-5557
+                                        name:
+                                          type: string
+                                          maxLength: 30
+                                          example: George x225
+        '400':
+          description: The query parameters used in the query of the ap_vendors endpoint were invalid.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Query Parameters Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          potential_query_parameters:
+                            title: PotentialQueryParms
+                            type: array
+                            minItems: 1
+                            items:
+                              anyOf:
+                                - title: QueryParm1Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: FIXED_STRING_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                    parameter_notes:
+                                      type: string
+                                      example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                                - title: QueryParm2Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: STRING_SEARCH_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: String search parameter (generally contains type text search)
+                                    parameter_notes:
+                                      type: string
+                                      example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                                - title: QueryParm3Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: NUMERIC_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Numeric parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                                - title: QueryParm4Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: DATE_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Date parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+  '/winery/v1/vendors/{vendor_id}':
+    parameters:
+      - name: vendor_id
+        in: path
+        description: vendor_id is a unique identifier for a vendor (AKA vendor number).
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+    get:
+      operationId: getV1ApVendor
+      tags:
+        - ApVendorsGET
+      summary: Retrieves an individual AP vendor resource.
+      description: 'By providing a valid vendor_id, an individual AP vendor resource is retrieved and returned.'
+      responses:
+        '200':
+          description: Ok - The get of an vendor resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          vendor:
+                            title: V1GETApVendorObject
+                            type: object
+                            properties:
+                              vendor_id:
+                                type: integer
+                                minimum: 1
+                                maximum: 999999
+                                example: 1234
+                              vendor_name:
+                                type: string
+                                maxLength: 30
+                                example: Vendor ABC
+                              sort_sequence_field:
+                                type: string
+                                maxLength: 6
+                                example: ABC
+                              apv_category_code:
+                                type: string
+                                maxLength: 2
+                                example: '02'
+                              last_active_date:
+                                type: string
+                                maxLength: 10
+                                example: 01/01/19
+                              balance_due_to_vendor:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 1234.45
+                              num_open_invoices:
+                                type: integer
+                                minimum: 0
+                                maximum: 9999
+                                example: 15
+                              open_po_amount:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 1234.45
+                              open_po_count:
+                                type: integer
+                                minimum: 0
+                                maximum: 9999
+                                example: 12
+                              wholesale_cust_num:
+                                type: integer
+                                minimum: 0
+                                maximum: 9999
+                                example: 100
+                              minimum_check_amount:
+                                type: number
+                                minimum: 0
+                                maximum: 999999999.99
+                                example: 50
+                              one_time_vendor_flag:
+                                type: boolean
+                                example: false
+                              setup_date:
+                                type: string
+                                maxLength: 10
+                                example: 01/01/2018
+                              setup_user:
+                                type: string
+                                maxLength: 8
+                                example: GEORGE
+                              one_invoice_per_check_flag:
+                                type: boolean
+                                example: false
+                              apg_distribution_code:
+                                type: string
+                                maxLength: 4
+                                example: TEST
+                              apt_terms_code:
+                                type: string
+                                maxLength: 2
+                                example: NA
+                              ap9_1099_code:
+                                type: string
+                                maxLength: 2
+                                example: 'NO'
+                              aph_default_hold_code:
+                                type: string
+                                maxLength: 2
+                                example: NC
+                              active_status:
+                                title: VendorStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 8
+                                enum:
+                                  - Active
+                                  - Inactive
+                                example: Inactive
+                              inactivated_date:
+                                type: string
+                                maxLength: 10
+                                example: 04/05/2018
+                              federal_id_number:
+                                type: string
+                                maxLength: 12
+                                example: 12-3456789
+                              preferred_payment_type:
+                                title: VendorPrefPaymentEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 13
+                                enum:
+                                  - Printed check
+                                  - E-Pay
+                                  - ' '
+                                example: E-Pay
+                              apl_ledger_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              ape_edd_code:
+                                type: string
+                                maxLength: 2
+                                example: 'NO'
+                              1099_name:
+                                type: string
+                                maxLength: 30
+                                example: Joe Schmo
+                              gl_distribution_account_num:
+                                type: string
+                                maxLength: 10
+                                example: 11-110
+                              invoices:
+                                type: array
+                                items:
+                                  title: V1GETInvoiceObject
+                                  type: object
+                                  properties:
+                                    invoice_id:
+                                      type: string
+                                      maxLength: 20
+                                      example: '123456789'
+                                    invoice_status:
+                                      title: InvoiceStatusEnum
+                                      x-tags:
+                                        - Enumeration
+                                      type: string
+                                      maxLength: 12
+                                      enum:
+                                        - Open
+                                        - Paid
+                                        - EqualOffset
+                                        - ' '
+                                      example: Open
+                                    invoice_type:
+                                      title: InvoiceTypeEnum
+                                      x-tags:
+                                        - Enumeration
+                                      type: string
+                                      maxLength: 11
+                                      enum:
+                                        - Invoice
+                                        - Credit Memo
+                                        - ' '
+                                      example: Invoice
+                                    beginning_ap_batch_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 01/01/2019
+                                    ending_ap_batch_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 02/01/2019
+                                    invoice_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 12/15/2018
+                                    description:
+                                      type: string
+                                      maxLength: 30
+                                      example: Party catering services
+                                    amount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 1235.84
+                                    available_discount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 500
+                                    used_discount:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 200
+                                    balance_due:
+                                      type: number
+                                      minimum: -999999999.99
+                                      maximum: 999999999.99
+                                      example: 1035.84
+                                    first_trans_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 01/12/2019
+                                    last_trans_date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 01/20/2019
+                                    ftt_batch_form_type_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: BN
+                                    ap9_1099_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: 'NO'
+                                    voucher_number:
+                                      type: number
+                                      minimum: 0
+                                      maximum: 99999.9
+                                      example: 123.4
+                                    apl_ledger_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: '01'
+                                    reference_number:
+                                      type: string
+                                      maxLength: 10
+                                      example: '654321'
+                              epay_info:
+                                title: V1GETEpayInfoObject
+                                type: object
+                                properties:
+                                  epay_account_type:
+                                    title: EpayAccountTypeEnum
+                                    x-tags:
+                                      - Enumeration
+                                    type: string
+                                    maxLength: 8
+                                    enum:
+                                      - Checking
+                                      - Savings
+                                      - ' '
+                                    example: Checking
+                                  epay_rdfi_account_number:
+                                    type: string
+                                    maxLength: 18
+                                    example: '12345678901234567'
+                                  epay_type:
+                                    type: string
+                                    maxLength: 3
+                                    example: CHK
+                                  cka_epay_account_code:
+                                    type: string
+                                    maxLength: 2
+                                    example: A1
+                                  standard_entry_class:
+                                    type: string
+                                    maxLength: 3
+                                    example: CTX
+                                  transit_routing_number:
+                                    type: string
+                                    maxLength: 10
+                                    example: '0'
+                              ap_contact_info:
+                                title: V1GETApContactInfoObject
+                                type: object
+                                properties:
+                                  street_address_1:
+                                    type: string
+                                    maxLength: 30
+                                    example: 123 Some St. NW
+                                  street_address_2:
+                                    type: string
+                                    maxLength: 30
+                                    example: Suite B
+                                  city:
+                                    type: string
+                                    maxLength: 24
+                                    example: Some City
+                                  state:
+                                    type: string
+                                    maxLength: 2
+                                    example: CA
+                                  zip_code:
+                                    type: string
+                                    maxLength: 10
+                                    example: '95404'
+                                  country_code:
+                                    type: string
+                                    maxLength: 3
+                                    example: USA
+                                  phone_number:
+                                    type: string
+                                    maxLength: 20
+                                    example: (555) 555-5555
+                                  fax_number:
+                                    type: string
+                                    maxLength: 20
+                                    example: (555) 555-5556
+                                  email_address:
+                                    type: string
+                                    maxLength: 60
+                                    example: business@email.com
+                                  name:
+                                    type: string
+                                    maxLength: 30
+                                    example: Angela X223
+                              po_contact_info:
+                                title: V1GETPoContactInfoObject
+                                type: object
+                                properties:
+                                  street_address_1:
+                                    type: string
+                                    maxLength: 30
+                                    example: 123 Some St. NW
+                                  street_address_2:
+                                    type: string
+                                    maxLength: 30
+                                    example: Suite B
+                                  city:
+                                    type: string
+                                    maxLength: 24
+                                    example: Some City
+                                  state:
+                                    type: string
+                                    maxLength: 2
+                                    example: CA
+                                  zip_code:
+                                    type: string
+                                    maxLength: 10
+                                    example: '95404'
+                                  phone_number:
+                                    type: string
+                                    maxLength: 20
+                                    example: (555) 555-5557
+                                  name:
+                                    type: string
+                                    maxLength: 30
+                                    example: George x225
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+  '/winery/v1/vendors/{vendor_id}/epay_info':
+    parameters:
+      - name: vendor_id
+        in: path
+        description: vendor_id is a unique identifier for a vendor (AKA vendor number).
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+    get:
+      operationId: getV1ApVendorEpayInfo
+      tags:
+        - ApVendorsGET
+      summary: Retrieves epay information for a vendor.
+      description: The epay_info object contains information pertinent to the AMS system's limited ability to interface with banking systems.
+      responses:
+        '200':
+          description: Ok - The get of the epay_info for an vendor resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          epay_info:
+                            title: V1GETEpayInfoObject
+                            type: object
+                            properties:
+                              epay_account_type:
+                                title: EpayAccountTypeEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 8
+                                enum:
+                                  - Checking
+                                  - Savings
+                                  - ' '
+                                example: Checking
+                              epay_rdfi_account_number:
+                                type: string
+                                maxLength: 18
+                                example: '12345678901234567'
+                              epay_type:
+                                type: string
+                                maxLength: 3
+                                example: CHK
+                              cka_epay_account_code:
+                                type: string
+                                maxLength: 2
+                                example: A1
+                              standard_entry_class:
+                                type: string
+                                maxLength: 3
+                                example: CTX
+                              transit_routing_number:
+                                type: string
+                                maxLength: 10
+                                example: '0'
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+  '/winery/v1/vendors/{vendor_id}/ap_contact_info':
+    parameters:
+      - name: vendor_id
+        in: path
+        description: vendor_id is a unique identifier for a vendor (AKA vendor number).
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+    get:
+      operationId: getV1ApVendorApContactInfo
+      tags:
+        - ApVendorsGET
+      summary: Retrieves AP contact information for a vendor.
+      description: The ap_contact_info object contains information relating to the information required for the accounts payable department to work with the vendor.
+      responses:
+        '200':
+          description: Ok - The get of the AP contact info for an vendor resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          ap_contact_info:
+                            title: V1GETApContactInfoObject
+                            type: object
+                            properties:
+                              street_address_1:
+                                type: string
+                                maxLength: 30
+                                example: 123 Some St. NW
+                              street_address_2:
+                                type: string
+                                maxLength: 30
+                                example: Suite B
+                              city:
+                                type: string
+                                maxLength: 24
+                                example: Some City
+                              state:
+                                type: string
+                                maxLength: 2
+                                example: CA
+                              zip_code:
+                                type: string
+                                maxLength: 10
+                                example: '95404'
+                              country_code:
+                                type: string
+                                maxLength: 3
+                                example: USA
+                              phone_number:
+                                type: string
+                                maxLength: 20
+                                example: (555) 555-5555
+                              fax_number:
+                                type: string
+                                maxLength: 20
+                                example: (555) 555-5556
+                              email_address:
+                                type: string
+                                maxLength: 60
+                                example: business@email.com
+                              name:
+                                type: string
+                                maxLength: 30
+                                example: Angela X223
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+  '/winery/v1/vendors/{vendor_id}/po_contact_info':
+    parameters:
+      - name: vendor_id
+        in: path
+        description: vendor_id is a unique identifier for a vendor (AKA vendor number).
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+    get:
+      operationId: getV1ApVendorPoContactInfo
+      tags:
+        - ApVendorsGET
+      summary: Retrieves PO contact information for a vendor.
+      description: The po_contact_info object contains information relating to the information required for the purchasing department to work with the vendor.
+      responses:
+        '200':
+          description: Ok - The get of the PO contact info for an vendor resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          po_contact_info:
+                            title: V1GETPoContactInfoObject
+                            type: object
+                            properties:
+                              street_address_1:
+                                type: string
+                                maxLength: 30
+                                example: 123 Some St. NW
+                              street_address_2:
+                                type: string
+                                maxLength: 30
+                                example: Suite B
+                              city:
+                                type: string
+                                maxLength: 24
+                                example: Some City
+                              state:
+                                type: string
+                                maxLength: 2
+                                example: CA
+                              zip_code:
+                                type: string
+                                maxLength: 10
+                                example: '95404'
+                              phone_number:
+                                type: string
+                                maxLength: 20
+                                example: (555) 555-5557
+                              name:
+                                type: string
+                                maxLength: 30
+                                example: George x225
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+  '/winery/v1/vendors/{vendor_id}/invoices':
+    parameters:
+      - name: vendor_id
+        in: path
+        description: vendor_id is a unique identifier for a vendor (AKA vendor number).
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+    get:
+      operationId: getV1ApVendorInvoices
+      tags:
+        - ApVendorsGET
+      summary: Retrieves an array of AP invoices associated with the vendor.
+      description: Current and historical invoice information is contained in this array.
+      responses:
+        '200':
+          description: Ok - The get of the invoices array for an vendor resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          invoices:
+                            type: array
+                            items:
+                              title: V1GETInvoiceObject
+                              type: object
+                              properties:
+                                invoice_id:
+                                  type: string
+                                  maxLength: 20
+                                  example: '123456789'
+                                invoice_status:
+                                  title: InvoiceStatusEnum
+                                  x-tags:
+                                    - Enumeration
+                                  type: string
+                                  maxLength: 12
+                                  enum:
+                                    - Open
+                                    - Paid
+                                    - EqualOffset
+                                    - ' '
+                                  example: Open
+                                invoice_type:
+                                  title: InvoiceTypeEnum
+                                  x-tags:
+                                    - Enumeration
+                                  type: string
+                                  maxLength: 11
+                                  enum:
+                                    - Invoice
+                                    - Credit Memo
+                                    - ' '
+                                  example: Invoice
+                                beginning_ap_batch_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 01/01/2019
+                                ending_ap_batch_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 02/01/2019
+                                invoice_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 12/15/2018
+                                description:
+                                  type: string
+                                  maxLength: 30
+                                  example: Party catering services
+                                amount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 1235.84
+                                available_discount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 500
+                                used_discount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 200
+                                balance_due:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 1035.84
+                                first_trans_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 01/12/2019
+                                last_trans_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 01/20/2019
+                                ftt_batch_form_type_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: BN
+                                ap9_1099_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: 'NO'
+                                voucher_number:
+                                  type: number
+                                  minimum: 0
+                                  maximum: 99999.9
+                                  example: 123.4
+                                apl_ledger_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: '01'
+                                reference_number:
+                                  type: string
+                                  maxLength: 10
+                                  example: '654321'
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+  '/winery/v1/vendors/{vendor_id}/invoices/{invoice_id}':
+    parameters:
+      - name: vendor_id
+        in: path
+        description: vendor_id is a unique identifier for a vendor (AKA vendor number).
+        required: true
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 999999
+      - name: invoice_id
+        in: path
+        description: invoice_id is a unique identifier for an AP invoice associated with vendor (AKA invoice number).
+        required: true
+        schema:
+          type: string
+          maxLength: 20
+    get:
+      operationId: getV1ApVendorInvoice
+      tags:
+        - ApVendorsGET
+      summary: Retrieves an individual invoice object.
+      description: Retrieves invoice information specific to one invoice related to the vendor. The invoice is reference by invoice_id.
+      responses:
+        '200':
+          description: Ok - The get of invoice from the invoices array for an vendor resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          invoice:
+                            title: V1GETInvoiceObject
+                            type: object
+                            properties:
+                              invoice_id:
+                                type: string
+                                maxLength: 20
+                                example: '123456789'
+                              invoice_status:
+                                title: InvoiceStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 12
+                                enum:
+                                  - Open
+                                  - Paid
+                                  - EqualOffset
+                                  - ' '
+                                example: Open
+                              invoice_type:
+                                title: InvoiceTypeEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 11
+                                enum:
+                                  - Invoice
+                                  - Credit Memo
+                                  - ' '
+                                example: Invoice
+                              beginning_ap_batch_date:
+                                type: string
+                                maxLength: 10
+                                example: 01/01/2019
+                              ending_ap_batch_date:
+                                type: string
+                                maxLength: 10
+                                example: 02/01/2019
+                              invoice_date:
+                                type: string
+                                maxLength: 10
+                                example: 12/15/2018
+                              description:
+                                type: string
+                                maxLength: 30
+                                example: Party catering services
+                              amount:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 1235.84
+                              available_discount:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 500
+                              used_discount:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 200
+                              balance_due:
+                                type: number
+                                minimum: -999999999.99
+                                maximum: 999999999.99
+                                example: 1035.84
+                              first_trans_date:
+                                type: string
+                                maxLength: 10
+                                example: 01/12/2019
+                              last_trans_date:
+                                type: string
+                                maxLength: 10
+                                example: 01/20/2019
+                              ftt_batch_form_type_code:
+                                type: string
+                                maxLength: 2
+                                example: BN
+                              ap9_1099_code:
+                                type: string
+                                maxLength: 2
+                                example: 'NO'
+                              voucher_number:
+                                type: number
+                                minimum: 0
+                                maximum: 99999.9
+                                example: 123.4
+                              apl_ledger_code:
+                                type: string
+                                maxLength: 2
+                                example: '01'
+                              reference_number:
+                                type: string
+                                maxLength: 10
+                                example: '654321'
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+components:
+  securitySchemes:
+    AMSBearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    NameSearchQueryParm:
+      name: name
+      in: query
+      description: Parameter value will be used to find customer accounts with an email containing the search string provided. The search methodology is of the contains type.
+      required: false
+      schema:
+        type: string
+    DetailQueryParm:
+      name: detail
+      in: query
+      description: 'Flag indicating whether to include customer detail in results array; full customer objects vs. unique ID (customer number). By default, the results array will contain full customer objects. Valid value is ''NO''.'
+      required: false
+      schema:
+        type: string
+    PaginationQueryParm:
+      name: pagination
+      in: query
+      description: 'Query parameter that will allow for retrieving "pages" of results from the ap_vendors resource. The format of the value passed must be the following, {number1},{number2}. The first numeric value indicates the number of results per page and the second numeric value indicates the requested page of results.'
+      required: false
+      schema:
+        type: string
+    VendorIdPathParm:
+      name: vendor_id
+      in: path
+      description: vendor_id is a unique identifier for a vendor (AKA vendor number).
+      required: true
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 999999
+    InvoiceIdPathParm:
+      name: invoice_id
+      in: path
+      description: invoice_id is a unique identifier for an AP invoice associated with vendor (AKA invoice number).
+      required: true
+      schema:
+        type: string
+        maxLength: 20
+  responses:
+    200SuccessfulV1VendorQuery:
+      description: Ok - The query of the vendors resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          vendors_found:
+                            type: integer
+                            example: 1
+                          vendors:
+                            type: array
+                            items:
+                              title: V1GETApVendorObject
+                              type: object
+                              properties:
+                                vendor_id:
+                                  type: integer
+                                  minimum: 1
+                                  maximum: 999999
+                                  example: 1234
+                                vendor_name:
+                                  type: string
+                                  maxLength: 30
+                                  example: Vendor ABC
+                                sort_sequence_field:
+                                  type: string
+                                  maxLength: 6
+                                  example: ABC
+                                apv_category_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: '02'
+                                last_active_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 01/01/19
+                                balance_due_to_vendor:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 1234.45
+                                num_open_invoices:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 9999
+                                  example: 15
+                                open_po_amount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 1234.45
+                                open_po_count:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 9999
+                                  example: 12
+                                wholesale_cust_num:
+                                  type: integer
+                                  minimum: 0
+                                  maximum: 9999
+                                  example: 100
+                                minimum_check_amount:
+                                  type: number
+                                  minimum: 0
+                                  maximum: 999999999.99
+                                  example: 50
+                                one_time_vendor_flag:
+                                  type: boolean
+                                  example: false
+                                setup_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 01/01/2018
+                                setup_user:
+                                  type: string
+                                  maxLength: 8
+                                  example: GEORGE
+                                one_invoice_per_check_flag:
+                                  type: boolean
+                                  example: false
+                                apg_distribution_code:
+                                  type: string
+                                  maxLength: 4
+                                  example: TEST
+                                apt_terms_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: NA
+                                ap9_1099_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: 'NO'
+                                aph_default_hold_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: NC
+                                active_status:
+                                  title: VendorStatusEnum
+                                  x-tags:
+                                    - Enumeration
+                                  type: string
+                                  maxLength: 8
+                                  enum:
+                                    - Active
+                                    - Inactive
+                                  example: Inactive
+                                inactivated_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 04/05/2018
+                                federal_id_number:
+                                  type: string
+                                  maxLength: 12
+                                  example: 12-3456789
+                                preferred_payment_type:
+                                  title: VendorPrefPaymentEnum
+                                  x-tags:
+                                    - Enumeration
+                                  type: string
+                                  maxLength: 13
+                                  enum:
+                                    - Printed check
+                                    - E-Pay
+                                    - ' '
+                                  example: E-Pay
+                                apl_ledger_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: '01'
+                                ape_edd_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: 'NO'
+                                1099_name:
+                                  type: string
+                                  maxLength: 30
+                                  example: Joe Schmo
+                                gl_distribution_account_num:
+                                  type: string
+                                  maxLength: 10
+                                  example: 11-110
+                                invoices:
+                                  type: array
+                                  items:
+                                    title: V1GETInvoiceObject
+                                    type: object
+                                    properties:
+                                      invoice_id:
+                                        type: string
+                                        maxLength: 20
+                                        example: '123456789'
+                                      invoice_status:
+                                        title: InvoiceStatusEnum
+                                        x-tags:
+                                          - Enumeration
+                                        type: string
+                                        maxLength: 12
+                                        enum:
+                                          - Open
+                                          - Paid
+                                          - EqualOffset
+                                          - ' '
+                                        example: Open
+                                      invoice_type:
+                                        title: InvoiceTypeEnum
+                                        x-tags:
+                                          - Enumeration
+                                        type: string
+                                        maxLength: 11
+                                        enum:
+                                          - Invoice
+                                          - Credit Memo
+                                          - ' '
+                                        example: Invoice
+                                      beginning_ap_batch_date:
+                                        type: string
+                                        maxLength: 10
+                                        example: 01/01/2019
+                                      ending_ap_batch_date:
+                                        type: string
+                                        maxLength: 10
+                                        example: 02/01/2019
+                                      invoice_date:
+                                        type: string
+                                        maxLength: 10
+                                        example: 12/15/2018
+                                      description:
+                                        type: string
+                                        maxLength: 30
+                                        example: Party catering services
+                                      amount:
+                                        type: number
+                                        minimum: -999999999.99
+                                        maximum: 999999999.99
+                                        example: 1235.84
+                                      available_discount:
+                                        type: number
+                                        minimum: -999999999.99
+                                        maximum: 999999999.99
+                                        example: 500
+                                      used_discount:
+                                        type: number
+                                        minimum: -999999999.99
+                                        maximum: 999999999.99
+                                        example: 200
+                                      balance_due:
+                                        type: number
+                                        minimum: -999999999.99
+                                        maximum: 999999999.99
+                                        example: 1035.84
+                                      first_trans_date:
+                                        type: string
+                                        maxLength: 10
+                                        example: 01/12/2019
+                                      last_trans_date:
+                                        type: string
+                                        maxLength: 10
+                                        example: 01/20/2019
+                                      ftt_batch_form_type_code:
+                                        type: string
+                                        maxLength: 2
+                                        example: BN
+                                      ap9_1099_code:
+                                        type: string
+                                        maxLength: 2
+                                        example: 'NO'
+                                      voucher_number:
+                                        type: number
+                                        minimum: 0
+                                        maximum: 99999.9
+                                        example: 123.4
+                                      apl_ledger_code:
+                                        type: string
+                                        maxLength: 2
+                                        example: '01'
+                                      reference_number:
+                                        type: string
+                                        maxLength: 10
+                                        example: '654321'
+                                epay_info:
+                                  title: V1GETEpayInfoObject
+                                  type: object
+                                  properties:
+                                    epay_account_type:
+                                      title: EpayAccountTypeEnum
+                                      x-tags:
+                                        - Enumeration
+                                      type: string
+                                      maxLength: 8
+                                      enum:
+                                        - Checking
+                                        - Savings
+                                        - ' '
+                                      example: Checking
+                                    epay_rdfi_account_number:
+                                      type: string
+                                      maxLength: 18
+                                      example: '12345678901234567'
+                                    epay_type:
+                                      type: string
+                                      maxLength: 3
+                                      example: CHK
+                                    cka_epay_account_code:
+                                      type: string
+                                      maxLength: 2
+                                      example: A1
+                                    standard_entry_class:
+                                      type: string
+                                      maxLength: 3
+                                      example: CTX
+                                    transit_routing_number:
+                                      type: string
+                                      maxLength: 10
+                                      example: '0'
+                                ap_contact_info:
+                                  title: V1GETApContactInfoObject
+                                  type: object
+                                  properties:
+                                    street_address_1:
+                                      type: string
+                                      maxLength: 30
+                                      example: 123 Some St. NW
+                                    street_address_2:
+                                      type: string
+                                      maxLength: 30
+                                      example: Suite B
+                                    city:
+                                      type: string
+                                      maxLength: 24
+                                      example: Some City
+                                    state:
+                                      type: string
+                                      maxLength: 2
+                                      example: CA
+                                    zip_code:
+                                      type: string
+                                      maxLength: 10
+                                      example: '95404'
+                                    country_code:
+                                      type: string
+                                      maxLength: 3
+                                      example: USA
+                                    phone_number:
+                                      type: string
+                                      maxLength: 20
+                                      example: (555) 555-5555
+                                    fax_number:
+                                      type: string
+                                      maxLength: 20
+                                      example: (555) 555-5556
+                                    email_address:
+                                      type: string
+                                      maxLength: 60
+                                      example: business@email.com
+                                    name:
+                                      type: string
+                                      maxLength: 30
+                                      example: Angela X223
+                                po_contact_info:
+                                  title: V1GETPoContactInfoObject
+                                  type: object
+                                  properties:
+                                    street_address_1:
+                                      type: string
+                                      maxLength: 30
+                                      example: 123 Some St. NW
+                                    street_address_2:
+                                      type: string
+                                      maxLength: 30
+                                      example: Suite B
+                                    city:
+                                      type: string
+                                      maxLength: 24
+                                      example: Some City
+                                    state:
+                                      type: string
+                                      maxLength: 2
+                                      example: CA
+                                    zip_code:
+                                      type: string
+                                      maxLength: 10
+                                      example: '95404'
+                                    phone_number:
+                                      type: string
+                                      maxLength: 20
+                                      example: (555) 555-5557
+                                    name:
+                                      type: string
+                                      maxLength: 30
+                                      example: George x225
+    200SuccessfulV1VendorGet:
+      description: Ok - The get of an vendor resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      vendor:
+                        title: V1GETApVendorObject
+                        type: object
+                        properties:
+                          vendor_id:
+                            type: integer
+                            minimum: 1
+                            maximum: 999999
+                            example: 1234
+                          vendor_name:
+                            type: string
+                            maxLength: 30
+                            example: Vendor ABC
+                          sort_sequence_field:
+                            type: string
+                            maxLength: 6
+                            example: ABC
+                          apv_category_code:
+                            type: string
+                            maxLength: 2
+                            example: '02'
+                          last_active_date:
+                            type: string
+                            maxLength: 10
+                            example: 01/01/19
+                          balance_due_to_vendor:
+                            type: number
+                            minimum: -999999999.99
+                            maximum: 999999999.99
+                            example: 1234.45
+                          num_open_invoices:
+                            type: integer
+                            minimum: 0
+                            maximum: 9999
+                            example: 15
+                          open_po_amount:
+                            type: number
+                            minimum: -999999999.99
+                            maximum: 999999999.99
+                            example: 1234.45
+                          open_po_count:
+                            type: integer
+                            minimum: 0
+                            maximum: 9999
+                            example: 12
+                          wholesale_cust_num:
+                            type: integer
+                            minimum: 0
+                            maximum: 9999
+                            example: 100
+                          minimum_check_amount:
+                            type: number
+                            minimum: 0
+                            maximum: 999999999.99
+                            example: 50
+                          one_time_vendor_flag:
+                            type: boolean
+                            example: false
+                          setup_date:
+                            type: string
+                            maxLength: 10
+                            example: 01/01/2018
+                          setup_user:
+                            type: string
+                            maxLength: 8
+                            example: GEORGE
+                          one_invoice_per_check_flag:
+                            type: boolean
+                            example: false
+                          apg_distribution_code:
+                            type: string
+                            maxLength: 4
+                            example: TEST
+                          apt_terms_code:
+                            type: string
+                            maxLength: 2
+                            example: NA
+                          ap9_1099_code:
+                            type: string
+                            maxLength: 2
+                            example: 'NO'
+                          aph_default_hold_code:
+                            type: string
+                            maxLength: 2
+                            example: NC
+                          active_status:
+                            title: VendorStatusEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            maxLength: 8
+                            enum:
+                              - Active
+                              - Inactive
+                            example: Inactive
+                          inactivated_date:
+                            type: string
+                            maxLength: 10
+                            example: 04/05/2018
+                          federal_id_number:
+                            type: string
+                            maxLength: 12
+                            example: 12-3456789
+                          preferred_payment_type:
+                            title: VendorPrefPaymentEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            maxLength: 13
+                            enum:
+                              - Printed check
+                              - E-Pay
+                              - ' '
+                            example: E-Pay
+                          apl_ledger_code:
+                            type: string
+                            maxLength: 2
+                            example: '01'
+                          ape_edd_code:
+                            type: string
+                            maxLength: 2
+                            example: 'NO'
+                          1099_name:
+                            type: string
+                            maxLength: 30
+                            example: Joe Schmo
+                          gl_distribution_account_num:
+                            type: string
+                            maxLength: 10
+                            example: 11-110
+                          invoices:
+                            type: array
+                            items:
+                              title: V1GETInvoiceObject
+                              type: object
+                              properties:
+                                invoice_id:
+                                  type: string
+                                  maxLength: 20
+                                  example: '123456789'
+                                invoice_status:
+                                  title: InvoiceStatusEnum
+                                  x-tags:
+                                    - Enumeration
+                                  type: string
+                                  maxLength: 12
+                                  enum:
+                                    - Open
+                                    - Paid
+                                    - EqualOffset
+                                    - ' '
+                                  example: Open
+                                invoice_type:
+                                  title: InvoiceTypeEnum
+                                  x-tags:
+                                    - Enumeration
+                                  type: string
+                                  maxLength: 11
+                                  enum:
+                                    - Invoice
+                                    - Credit Memo
+                                    - ' '
+                                  example: Invoice
+                                beginning_ap_batch_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 01/01/2019
+                                ending_ap_batch_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 02/01/2019
+                                invoice_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 12/15/2018
+                                description:
+                                  type: string
+                                  maxLength: 30
+                                  example: Party catering services
+                                amount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 1235.84
+                                available_discount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 500
+                                used_discount:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 200
+                                balance_due:
+                                  type: number
+                                  minimum: -999999999.99
+                                  maximum: 999999999.99
+                                  example: 1035.84
+                                first_trans_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 01/12/2019
+                                last_trans_date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 01/20/2019
+                                ftt_batch_form_type_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: BN
+                                ap9_1099_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: 'NO'
+                                voucher_number:
+                                  type: number
+                                  minimum: 0
+                                  maximum: 99999.9
+                                  example: 123.4
+                                apl_ledger_code:
+                                  type: string
+                                  maxLength: 2
+                                  example: '01'
+                                reference_number:
+                                  type: string
+                                  maxLength: 10
+                                  example: '654321'
+                          epay_info:
+                            title: V1GETEpayInfoObject
+                            type: object
+                            properties:
+                              epay_account_type:
+                                title: EpayAccountTypeEnum
+                                x-tags:
+                                  - Enumeration
+                                type: string
+                                maxLength: 8
+                                enum:
+                                  - Checking
+                                  - Savings
+                                  - ' '
+                                example: Checking
+                              epay_rdfi_account_number:
+                                type: string
+                                maxLength: 18
+                                example: '12345678901234567'
+                              epay_type:
+                                type: string
+                                maxLength: 3
+                                example: CHK
+                              cka_epay_account_code:
+                                type: string
+                                maxLength: 2
+                                example: A1
+                              standard_entry_class:
+                                type: string
+                                maxLength: 3
+                                example: CTX
+                              transit_routing_number:
+                                type: string
+                                maxLength: 10
+                                example: '0'
+                          ap_contact_info:
+                            title: V1GETApContactInfoObject
+                            type: object
+                            properties:
+                              street_address_1:
+                                type: string
+                                maxLength: 30
+                                example: 123 Some St. NW
+                              street_address_2:
+                                type: string
+                                maxLength: 30
+                                example: Suite B
+                              city:
+                                type: string
+                                maxLength: 24
+                                example: Some City
+                              state:
+                                type: string
+                                maxLength: 2
+                                example: CA
+                              zip_code:
+                                type: string
+                                maxLength: 10
+                                example: '95404'
+                              country_code:
+                                type: string
+                                maxLength: 3
+                                example: USA
+                              phone_number:
+                                type: string
+                                maxLength: 20
+                                example: (555) 555-5555
+                              fax_number:
+                                type: string
+                                maxLength: 20
+                                example: (555) 555-5556
+                              email_address:
+                                type: string
+                                maxLength: 60
+                                example: business@email.com
+                              name:
+                                type: string
+                                maxLength: 30
+                                example: Angela X223
+                          po_contact_info:
+                            title: V1GETPoContactInfoObject
+                            type: object
+                            properties:
+                              street_address_1:
+                                type: string
+                                maxLength: 30
+                                example: 123 Some St. NW
+                              street_address_2:
+                                type: string
+                                maxLength: 30
+                                example: Suite B
+                              city:
+                                type: string
+                                maxLength: 24
+                                example: Some City
+                              state:
+                                type: string
+                                maxLength: 2
+                                example: CA
+                              zip_code:
+                                type: string
+                                maxLength: 10
+                                example: '95404'
+                              phone_number:
+                                type: string
+                                maxLength: 20
+                                example: (555) 555-5557
+                              name:
+                                type: string
+                                maxLength: 30
+                                example: George x225
+    200SuccessfulV1EpayInfoGet:
+      description: Ok - The get of the epay_info for an vendor resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      epay_info:
+                        title: V1GETEpayInfoObject
+                        type: object
+                        properties:
+                          epay_account_type:
+                            title: EpayAccountTypeEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            maxLength: 8
+                            enum:
+                              - Checking
+                              - Savings
+                              - ' '
+                            example: Checking
+                          epay_rdfi_account_number:
+                            type: string
+                            maxLength: 18
+                            example: '12345678901234567'
+                          epay_type:
+                            type: string
+                            maxLength: 3
+                            example: CHK
+                          cka_epay_account_code:
+                            type: string
+                            maxLength: 2
+                            example: A1
+                          standard_entry_class:
+                            type: string
+                            maxLength: 3
+                            example: CTX
+                          transit_routing_number:
+                            type: string
+                            maxLength: 10
+                            example: '0'
+    200SuccessfulV1ApContactInfoGet:
+      description: Ok - The get of the AP contact info for an vendor resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      ap_contact_info:
+                        title: V1GETApContactInfoObject
+                        type: object
+                        properties:
+                          street_address_1:
+                            type: string
+                            maxLength: 30
+                            example: 123 Some St. NW
+                          street_address_2:
+                            type: string
+                            maxLength: 30
+                            example: Suite B
+                          city:
+                            type: string
+                            maxLength: 24
+                            example: Some City
+                          state:
+                            type: string
+                            maxLength: 2
+                            example: CA
+                          zip_code:
+                            type: string
+                            maxLength: 10
+                            example: '95404'
+                          country_code:
+                            type: string
+                            maxLength: 3
+                            example: USA
+                          phone_number:
+                            type: string
+                            maxLength: 20
+                            example: (555) 555-5555
+                          fax_number:
+                            type: string
+                            maxLength: 20
+                            example: (555) 555-5556
+                          email_address:
+                            type: string
+                            maxLength: 60
+                            example: business@email.com
+                          name:
+                            type: string
+                            maxLength: 30
+                            example: Angela X223
+    200SuccessfulV1PoContactInfoGet:
+      description: Ok - The get of the PO contact info for an vendor resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      po_contact_info:
+                        title: V1GETPoContactInfoObject
+                        type: object
+                        properties:
+                          street_address_1:
+                            type: string
+                            maxLength: 30
+                            example: 123 Some St. NW
+                          street_address_2:
+                            type: string
+                            maxLength: 30
+                            example: Suite B
+                          city:
+                            type: string
+                            maxLength: 24
+                            example: Some City
+                          state:
+                            type: string
+                            maxLength: 2
+                            example: CA
+                          zip_code:
+                            type: string
+                            maxLength: 10
+                            example: '95404'
+                          phone_number:
+                            type: string
+                            maxLength: 20
+                            example: (555) 555-5557
+                          name:
+                            type: string
+                            maxLength: 30
+                            example: George x225
+    200SuccessfulV1InvoicesGet:
+      description: Ok - The get of the invoices array for an vendor resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      invoices:
+                        type: array
+                        items:
+                          title: V1GETInvoiceObject
+                          type: object
+                          properties:
+                            invoice_id:
+                              type: string
+                              maxLength: 20
+                              example: '123456789'
+                            invoice_status:
+                              title: InvoiceStatusEnum
+                              x-tags:
+                                - Enumeration
+                              type: string
+                              maxLength: 12
+                              enum:
+                                - Open
+                                - Paid
+                                - EqualOffset
+                                - ' '
+                              example: Open
+                            invoice_type:
+                              title: InvoiceTypeEnum
+                              x-tags:
+                                - Enumeration
+                              type: string
+                              maxLength: 11
+                              enum:
+                                - Invoice
+                                - Credit Memo
+                                - ' '
+                              example: Invoice
+                            beginning_ap_batch_date:
+                              type: string
+                              maxLength: 10
+                              example: 01/01/2019
+                            ending_ap_batch_date:
+                              type: string
+                              maxLength: 10
+                              example: 02/01/2019
+                            invoice_date:
+                              type: string
+                              maxLength: 10
+                              example: 12/15/2018
+                            description:
+                              type: string
+                              maxLength: 30
+                              example: Party catering services
+                            amount:
+                              type: number
+                              minimum: -999999999.99
+                              maximum: 999999999.99
+                              example: 1235.84
+                            available_discount:
+                              type: number
+                              minimum: -999999999.99
+                              maximum: 999999999.99
+                              example: 500
+                            used_discount:
+                              type: number
+                              minimum: -999999999.99
+                              maximum: 999999999.99
+                              example: 200
+                            balance_due:
+                              type: number
+                              minimum: -999999999.99
+                              maximum: 999999999.99
+                              example: 1035.84
+                            first_trans_date:
+                              type: string
+                              maxLength: 10
+                              example: 01/12/2019
+                            last_trans_date:
+                              type: string
+                              maxLength: 10
+                              example: 01/20/2019
+                            ftt_batch_form_type_code:
+                              type: string
+                              maxLength: 2
+                              example: BN
+                            ap9_1099_code:
+                              type: string
+                              maxLength: 2
+                              example: 'NO'
+                            voucher_number:
+                              type: number
+                              minimum: 0
+                              maximum: 99999.9
+                              example: 123.4
+                            apl_ledger_code:
+                              type: string
+                              maxLength: 2
+                              example: '01'
+                            reference_number:
+                              type: string
+                              maxLength: 10
+                              example: '654321'
+    200SuccessfulV1InvoiceGet:
+      description: Ok - The get of invoice from the invoices array for an vendor resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      invoice:
+                        title: V1GETInvoiceObject
+                        type: object
+                        properties:
+                          invoice_id:
+                            type: string
+                            maxLength: 20
+                            example: '123456789'
+                          invoice_status:
+                            title: InvoiceStatusEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            maxLength: 12
+                            enum:
+                              - Open
+                              - Paid
+                              - EqualOffset
+                              - ' '
+                            example: Open
+                          invoice_type:
+                            title: InvoiceTypeEnum
+                            x-tags:
+                              - Enumeration
+                            type: string
+                            maxLength: 11
+                            enum:
+                              - Invoice
+                              - Credit Memo
+                              - ' '
+                            example: Invoice
+                          beginning_ap_batch_date:
+                            type: string
+                            maxLength: 10
+                            example: 01/01/2019
+                          ending_ap_batch_date:
+                            type: string
+                            maxLength: 10
+                            example: 02/01/2019
+                          invoice_date:
+                            type: string
+                            maxLength: 10
+                            example: 12/15/2018
+                          description:
+                            type: string
+                            maxLength: 30
+                            example: Party catering services
+                          amount:
+                            type: number
+                            minimum: -999999999.99
+                            maximum: 999999999.99
+                            example: 1235.84
+                          available_discount:
+                            type: number
+                            minimum: -999999999.99
+                            maximum: 999999999.99
+                            example: 500
+                          used_discount:
+                            type: number
+                            minimum: -999999999.99
+                            maximum: 999999999.99
+                            example: 200
+                          balance_due:
+                            type: number
+                            minimum: -999999999.99
+                            maximum: 999999999.99
+                            example: 1035.84
+                          first_trans_date:
+                            type: string
+                            maxLength: 10
+                            example: 01/12/2019
+                          last_trans_date:
+                            type: string
+                            maxLength: 10
+                            example: 01/20/2019
+                          ftt_batch_form_type_code:
+                            type: string
+                            maxLength: 2
+                            example: BN
+                          ap9_1099_code:
+                            type: string
+                            maxLength: 2
+                            example: 'NO'
+                          voucher_number:
+                            type: number
+                            minimum: 0
+                            maximum: 99999.9
+                            example: 123.4
+                          apl_ledger_code:
+                            type: string
+                            maxLength: 2
+                            example: '01'
+                          reference_number:
+                            type: string
+                            maxLength: 10
+                            example: '654321'
+    400BadParmsGetResponse:
+      description: The query parameters used in the query of the ap_vendors endpoint were invalid.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Query Parameters Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      potential_query_parameters:
+                        title: PotentialQueryParms
+                        type: array
+                        minItems: 1
+                        items:
+                          anyOf:
+                            - title: QueryParm1Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: FIXED_STRING_PARM
+                                parameter_type:
+                                  type: string
+                                  example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                parameter_notes:
+                                  type: string
+                                  example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                            - title: QueryParm2Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: STRING_SEARCH_PARM
+                                parameter_type:
+                                  type: string
+                                  example: String search parameter (generally contains type text search)
+                                parameter_notes:
+                                  type: string
+                                  example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                            - title: QueryParm3Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: NUMERIC_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Numeric parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                            - title: QueryParm4Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: DATE_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Date parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+    401UnauthorizedResponse:
+      description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+      content:
+        application/json:
+          schema:
+            title: Unauthorized - Invalid/Missing Authorization GUID Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    type: string
+                    example: Invalid authorization GUID.
+    403ForbiddenResponse:
+      description: The API User does not have access to the requested resource.
+      content:
+        application/json:
+          schema:
+            title: Forbidden - Access Not Permitted Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                required:
+                  - error_state
+                  - error_msg
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    oneOf:
+                      - title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      - title: InvalidImpersonationGuidMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: Invalid Impersonation Guid
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        oneOf:
+                          - title: NoApiAccessMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the called method on the called resource.
+                          - title: AmsUserImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the GET method on the dtc_orders API resource
+                          - title: DtcCustImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+    404NotFoundResponse:
+      description: The requested API resource does not exist.
+      content:
+        application/json:
+          schema:
+            title: Not Found - Resource Does Not Exist Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        title: ResourceNotFoundMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: API resource with provided ID not found.
+  schemas:
+    V1GetInvoicesArray:
+      type: array
+      items:
+        title: V1GETInvoiceObject
+        type: object
+        properties:
+          invoice_id:
+            type: string
+            maxLength: 20
+            example: '123456789'
+          invoice_status:
+            title: InvoiceStatusEnum
+            x-tags:
+              - Enumeration
+            type: string
+            maxLength: 12
+            enum:
+              - Open
+              - Paid
+              - EqualOffset
+              - ' '
+            example: Open
+          invoice_type:
+            title: InvoiceTypeEnum
+            x-tags:
+              - Enumeration
+            type: string
+            maxLength: 11
+            enum:
+              - Invoice
+              - Credit Memo
+              - ' '
+            example: Invoice
+          beginning_ap_batch_date:
+            type: string
+            maxLength: 10
+            example: 01/01/2019
+          ending_ap_batch_date:
+            type: string
+            maxLength: 10
+            example: 02/01/2019
+          invoice_date:
+            type: string
+            maxLength: 10
+            example: 12/15/2018
+          description:
+            type: string
+            maxLength: 30
+            example: Party catering services
+          amount:
+            type: number
+            minimum: -999999999.99
+            maximum: 999999999.99
+            example: 1235.84
+          available_discount:
+            type: number
+            minimum: -999999999.99
+            maximum: 999999999.99
+            example: 500
+          used_discount:
+            type: number
+            minimum: -999999999.99
+            maximum: 999999999.99
+            example: 200
+          balance_due:
+            type: number
+            minimum: -999999999.99
+            maximum: 999999999.99
+            example: 1035.84
+          first_trans_date:
+            type: string
+            maxLength: 10
+            example: 01/12/2019
+          last_trans_date:
+            type: string
+            maxLength: 10
+            example: 01/20/2019
+          ftt_batch_form_type_code:
+            type: string
+            maxLength: 2
+            example: BN
+          ap9_1099_code:
+            type: string
+            maxLength: 2
+            example: 'NO'
+          voucher_number:
+            type: number
+            minimum: 0
+            maximum: 99999.9
+            example: 123.4
+          apl_ledger_code:
+            type: string
+            maxLength: 2
+            example: '01'
+          reference_number:
+            type: string
+            maxLength: 10
+            example: '654321'
+    V1GetVendorsArray:
+      type: array
+      items:
+        title: V1GETApVendorObject
+        type: object
+        properties:
+          vendor_id:
+            type: integer
+            minimum: 1
+            maximum: 999999
+            example: 1234
+          vendor_name:
+            type: string
+            maxLength: 30
+            example: Vendor ABC
+          sort_sequence_field:
+            type: string
+            maxLength: 6
+            example: ABC
+          apv_category_code:
+            type: string
+            maxLength: 2
+            example: '02'
+          last_active_date:
+            type: string
+            maxLength: 10
+            example: 01/01/19
+          balance_due_to_vendor:
+            type: number
+            minimum: -999999999.99
+            maximum: 999999999.99
+            example: 1234.45
+          num_open_invoices:
+            type: integer
+            minimum: 0
+            maximum: 9999
+            example: 15
+          open_po_amount:
+            type: number
+            minimum: -999999999.99
+            maximum: 999999999.99
+            example: 1234.45
+          open_po_count:
+            type: integer
+            minimum: 0
+            maximum: 9999
+            example: 12
+          wholesale_cust_num:
+            type: integer
+            minimum: 0
+            maximum: 9999
+            example: 100
+          minimum_check_amount:
+            type: number
+            minimum: 0
+            maximum: 999999999.99
+            example: 50
+          one_time_vendor_flag:
+            type: boolean
+            example: false
+          setup_date:
+            type: string
+            maxLength: 10
+            example: 01/01/2018
+          setup_user:
+            type: string
+            maxLength: 8
+            example: GEORGE
+          one_invoice_per_check_flag:
+            type: boolean
+            example: false
+          apg_distribution_code:
+            type: string
+            maxLength: 4
+            example: TEST
+          apt_terms_code:
+            type: string
+            maxLength: 2
+            example: NA
+          ap9_1099_code:
+            type: string
+            maxLength: 2
+            example: 'NO'
+          aph_default_hold_code:
+            type: string
+            maxLength: 2
+            example: NC
+          active_status:
+            title: VendorStatusEnum
+            x-tags:
+              - Enumeration
+            type: string
+            maxLength: 8
+            enum:
+              - Active
+              - Inactive
+            example: Inactive
+          inactivated_date:
+            type: string
+            maxLength: 10
+            example: 04/05/2018
+          federal_id_number:
+            type: string
+            maxLength: 12
+            example: 12-3456789
+          preferred_payment_type:
+            title: VendorPrefPaymentEnum
+            x-tags:
+              - Enumeration
+            type: string
+            maxLength: 13
+            enum:
+              - Printed check
+              - E-Pay
+              - ' '
+            example: E-Pay
+          apl_ledger_code:
+            type: string
+            maxLength: 2
+            example: '01'
+          ape_edd_code:
+            type: string
+            maxLength: 2
+            example: 'NO'
+          1099_name:
+            type: string
+            maxLength: 30
+            example: Joe Schmo
+          gl_distribution_account_num:
+            type: string
+            maxLength: 10
+            example: 11-110
+          invoices:
+            type: array
+            items:
+              title: V1GETInvoiceObject
+              type: object
+              properties:
+                invoice_id:
+                  type: string
+                  maxLength: 20
+                  example: '123456789'
+                invoice_status:
+                  title: InvoiceStatusEnum
+                  x-tags:
+                    - Enumeration
+                  type: string
+                  maxLength: 12
+                  enum:
+                    - Open
+                    - Paid
+                    - EqualOffset
+                    - ' '
+                  example: Open
+                invoice_type:
+                  title: InvoiceTypeEnum
+                  x-tags:
+                    - Enumeration
+                  type: string
+                  maxLength: 11
+                  enum:
+                    - Invoice
+                    - Credit Memo
+                    - ' '
+                  example: Invoice
+                beginning_ap_batch_date:
+                  type: string
+                  maxLength: 10
+                  example: 01/01/2019
+                ending_ap_batch_date:
+                  type: string
+                  maxLength: 10
+                  example: 02/01/2019
+                invoice_date:
+                  type: string
+                  maxLength: 10
+                  example: 12/15/2018
+                description:
+                  type: string
+                  maxLength: 30
+                  example: Party catering services
+                amount:
+                  type: number
+                  minimum: -999999999.99
+                  maximum: 999999999.99
+                  example: 1235.84
+                available_discount:
+                  type: number
+                  minimum: -999999999.99
+                  maximum: 999999999.99
+                  example: 500
+                used_discount:
+                  type: number
+                  minimum: -999999999.99
+                  maximum: 999999999.99
+                  example: 200
+                balance_due:
+                  type: number
+                  minimum: -999999999.99
+                  maximum: 999999999.99
+                  example: 1035.84
+                first_trans_date:
+                  type: string
+                  maxLength: 10
+                  example: 01/12/2019
+                last_trans_date:
+                  type: string
+                  maxLength: 10
+                  example: 01/20/2019
+                ftt_batch_form_type_code:
+                  type: string
+                  maxLength: 2
+                  example: BN
+                ap9_1099_code:
+                  type: string
+                  maxLength: 2
+                  example: 'NO'
+                voucher_number:
+                  type: number
+                  minimum: 0
+                  maximum: 99999.9
+                  example: 123.4
+                apl_ledger_code:
+                  type: string
+                  maxLength: 2
+                  example: '01'
+                reference_number:
+                  type: string
+                  maxLength: 10
+                  example: '654321'
+          epay_info:
+            title: V1GETEpayInfoObject
+            type: object
+            properties:
+              epay_account_type:
+                title: EpayAccountTypeEnum
+                x-tags:
+                  - Enumeration
+                type: string
+                maxLength: 8
+                enum:
+                  - Checking
+                  - Savings
+                  - ' '
+                example: Checking
+              epay_rdfi_account_number:
+                type: string
+                maxLength: 18
+                example: '12345678901234567'
+              epay_type:
+                type: string
+                maxLength: 3
+                example: CHK
+              cka_epay_account_code:
+                type: string
+                maxLength: 2
+                example: A1
+              standard_entry_class:
+                type: string
+                maxLength: 3
+                example: CTX
+              transit_routing_number:
+                type: string
+                maxLength: 10
+                example: '0'
+          ap_contact_info:
+            title: V1GETApContactInfoObject
+            type: object
+            properties:
+              street_address_1:
+                type: string
+                maxLength: 30
+                example: 123 Some St. NW
+              street_address_2:
+                type: string
+                maxLength: 30
+                example: Suite B
+              city:
+                type: string
+                maxLength: 24
+                example: Some City
+              state:
+                type: string
+                maxLength: 2
+                example: CA
+              zip_code:
+                type: string
+                maxLength: 10
+                example: '95404'
+              country_code:
+                type: string
+                maxLength: 3
+                example: USA
+              phone_number:
+                type: string
+                maxLength: 20
+                example: (555) 555-5555
+              fax_number:
+                type: string
+                maxLength: 20
+                example: (555) 555-5556
+              email_address:
+                type: string
+                maxLength: 60
+                example: business@email.com
+              name:
+                type: string
+                maxLength: 30
+                example: Angela X223
+          po_contact_info:
+            title: V1GETPoContactInfoObject
+            type: object
+            properties:
+              street_address_1:
+                type: string
+                maxLength: 30
+                example: 123 Some St. NW
+              street_address_2:
+                type: string
+                maxLength: 30
+                example: Suite B
+              city:
+                type: string
+                maxLength: 24
+                example: Some City
+              state:
+                type: string
+                maxLength: 2
+                example: CA
+              zip_code:
+                type: string
+                maxLength: 10
+                example: '95404'
+              phone_number:
+                type: string
+                maxLength: 20
+                example: (555) 555-5557
+              name:
+                type: string
+                maxLength: 30
+                example: George x225

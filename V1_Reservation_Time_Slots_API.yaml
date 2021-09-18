@@ -1,0 +1,631 @@
+openapi: 3.0.0
+info:
+  title: V1 AMS Winery Reservation Time Slots API
+  description: |
+    RESTful API Access to the AMS Winery Scheduled Events business object. These are events at the winery tasting room. When an event is scheduled, a number of openings is defined and those are filled by subsequent reservations.
+    <br/>
+    <h1>Version Control Scheme</h1>
+    <p>Versions will be relatively static, when breaking/logic changes occur a new version will be created.</p>
+    <hr/>
+    <h1>Revision Log</h1>
+    <ul>
+    <li>2019-12-06 - KAS - Brand new API design for exposing GETs to the scheduled events (events on the calendar) in the system. These events will have reservations made against them.</li>
+    <li>2021-09-15 - KAS - Clean up, re-organize a bit, and import into Stoplight Studio/ReadMe. This involves the introduction of 'model' files, rather than the 'domains' that SwaggerHub allows for.</li>
+    </ul>
+  contact:
+    name: Helpdesk API Support
+    email: apisupport@amssoftware.com
+  license:
+    name: License Required
+    url: 'http://www.amssoftware.com'
+  version: '2019-12-06'
+servers:
+  - description: Development Server
+    url: 'https://thor2012-test.amscloudconnect.amssoftware.com/api'
+security:
+  - AMSBearerAuth: []
+tags:
+  - name: ReservationTimeSlotsGET
+    description: GETs to the API resource that represents scheduled events at the winery.
+paths:
+  /winery/v1/reservation_time_slots:
+    get:
+      operationId: getV1ReservationSlotsQueryResults
+      tags:
+        - ReservationTimeSlotsGET
+      summary: Returns a list of reservation time slots when provided appropriate query parameters.
+      description: Perform a search for open reservation time slots via various query metrics.
+      parameters:
+        - name: event_name
+          in: query
+          description: Parameter value will be used to find scheduled events by comparing the value to the name of the scheduled event. In order to return a scheduled event there must be an exact match.
+          required: false
+          schema:
+            type: string
+        - name: host
+          in: query
+          description: Parameter value will be used to find scheduled events by comparing the value to the host of a scheduled event. In order to return a scheduled event there must be an exact match.
+          required: false
+          schema:
+            type: string
+        - name: scheduled_date
+          in: query
+          description: Parameter value will be used to find scheduled events by comparing the value to the scheduled date of an event. Expected date format is MMDDYY. Query values MMDDYY (for and exact comparison) or a date range MMDDYY-MMDDYY.
+          required: true
+          schema:
+            type: string
+        - name: open_slots
+          in: query
+          description: 'Parameter value will be used to find reservations by comparing the value to the number of open reservation slots for a given scheduled event. Query values can be <### (for a less-than comparison), >### (for a greater-than comparison),'
+          required: false
+          schema:
+            type: integer
+        - name: location
+          in: query
+          description: Parameter value will be used to find scheduled events by comparing the value to the location of a scheduled event. In order to return a scheduled event there must be an exact match.
+          required: false
+          schema:
+            type: string
+        - name: customer_id
+          in: query
+          description: 'Parameter value will be used to contextualize the API request. Specifically, it will contextualize the request to one DTC customer.'
+          required: false
+          schema:
+            type: integer
+        - name: system_id
+          in: query
+          description: 'Parameter value will be used to contextualize the open event information. Specifically, this will return scheduled events for a specific AMS External System ID context.'
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Ok - The query of the reservation_time_slots resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              reservation_time_slots:
+                                type: array
+                                items:
+                                  title: V1GETTimeSlotObject
+                                  type: object
+                                  properties:
+                                    date:
+                                      type: string
+                                      maxLength: 10
+                                      example: 01/01/2020
+                                    time:
+                                      type: string
+                                      maxLength: 5
+                                      example: '13:00'
+                                    scheduled_events:
+                                      type: array
+                                      items:
+                                        title: V1GETScheduledEventObject
+                                        type: object
+                                        properties:
+                                          available_reservations:
+                                            type: integer
+                                            minimum: 0
+                                            maximum: 999999999
+                                          description:
+                                            type: string
+                                            maxLength: 40
+                                            example: This is a sit-down red wine tasting.
+                                          ecc_event_category_code:
+                                            type: string
+                                            maxLength: 2
+                                            example: LT
+                                          event_code:
+                                            type: string
+                                            maxLength: 8
+                                            example: REDWN
+                                          event_length:
+                                            type: string
+                                            maxLength: 30
+                                            example: 30 minutes
+                                          event_name:
+                                            type: string
+                                            maxLength: 20
+                                            example: Red Wine Tasting
+                                          event_type:
+                                            title: EventTypeEnum
+                                            x-tags:
+                                              - Enumeration
+                                            type: string
+                                            maxLength: 14
+                                            enum:
+                                              - No Charge
+                                              - Pay On Arrival
+                                              - Pay At Booking
+                                            example: Pay At Booking
+                                          host:
+                                            type: string
+                                            maxLength: 20
+                                            example: Joe Bob
+                                          location:
+                                            type: string
+                                            maxLength: 20
+                                            example: Library Room
+                                          price_per_reservation:
+                                            type: number
+                                            minimum: 0
+                                            maximum: 9999999.99
+                                          reservation_maximum:
+                                            type: integer
+                                            minimum: 0
+                                            maximum: 999999999
+                                          reservation_minimum:
+                                            type: integer
+                                            minimum: 0
+                                            maximum: 999999999
+                                          tax_per_reservation:
+                                            type: number
+                                            minimum: 0
+                                            maximum: 9999999.99
+        '400':
+          description: The query parameters used in the query of the reservation_time_slots endpoint were invalid.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Query Parameters Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          potential_query_parameters:
+                            title: PotentialQueryParms
+                            type: array
+                            minItems: 1
+                            items:
+                              anyOf:
+                                - title: QueryParm1Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: FIXED_STRING_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                    parameter_notes:
+                                      type: string
+                                      example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                                - title: QueryParm2Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: STRING_SEARCH_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: String search parameter (generally contains type text search)
+                                    parameter_notes:
+                                      type: string
+                                      example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                                - title: QueryParm3Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: NUMERIC_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Numeric parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                                - title: QueryParm4Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: DATE_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Date parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+components:
+  securitySchemes:
+    AMSBearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    EventNameQueryParm:
+      name: event_name
+      in: query
+      description: Parameter value will be used to find scheduled events by comparing the value to the name of the scheduled event. In order to return a scheduled event there must be an exact match.
+      required: false
+      schema:
+        type: string
+    HostQueryParm:
+      name: host
+      in: query
+      description: Parameter value will be used to find scheduled events by comparing the value to the host of a scheduled event. In order to return a scheduled event there must be an exact match.
+      required: false
+      schema:
+        type: string
+    ScheduledDateQueryParm:
+      name: scheduled_date
+      in: query
+      description: Parameter value will be used to find scheduled events by comparing the value to the scheduled date of an event. Expected date format is MMDDYY. Query values MMDDYY (for and exact comparison) or a date range MMDDYY-MMDDYY.
+      required: true
+      schema:
+        type: string
+    NumOpenSlotsQueryParm:
+      name: open_slots
+      in: query
+      description: 'Parameter value will be used to find reservations by comparing the value to the number of open reservation slots for a given scheduled event. Query values can be <### (for a less-than comparison), >### (for a greater-than comparison),'
+      required: false
+      schema:
+        type: integer
+    LocationQueryParm:
+      name: location
+      in: query
+      description: Parameter value will be used to find scheduled events by comparing the value to the location of a scheduled event. In order to return a scheduled event there must be an exact match.
+      required: false
+      schema:
+        type: string
+    CustomerIdQueryParm:
+      name: customer_id
+      in: query
+      description: 'Parameter value will be used to contextualize the API request. Specifically, it will contextualize the request to one DTC customer.'
+      required: false
+      schema:
+        type: integer
+    SystemIdQueryParm:
+      name: system_id
+      in: query
+      description: 'Parameter value will be used to contextualize the open event information. Specifically, this will return scheduled events for a specific AMS External System ID context.'
+      required: false
+      schema:
+        type: string
+  responses:
+    200SuccessfulV1ReservationTimeSlotsQuery:
+      description: Ok - The query of the reservation_time_slots resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          reservation_time_slots:
+                            type: array
+                            items:
+                              title: V1GETTimeSlotObject
+                              type: object
+                              properties:
+                                date:
+                                  type: string
+                                  maxLength: 10
+                                  example: 01/01/2020
+                                time:
+                                  type: string
+                                  maxLength: 5
+                                  example: '13:00'
+                                scheduled_events:
+                                  type: array
+                                  items:
+                                    title: V1GETScheduledEventObject
+                                    type: object
+                                    properties:
+                                      available_reservations:
+                                        type: integer
+                                        minimum: 0
+                                        maximum: 999999999
+                                      description:
+                                        type: string
+                                        maxLength: 40
+                                        example: This is a sit-down red wine tasting.
+                                      ecc_event_category_code:
+                                        type: string
+                                        maxLength: 2
+                                        example: LT
+                                      event_code:
+                                        type: string
+                                        maxLength: 8
+                                        example: REDWN
+                                      event_length:
+                                        type: string
+                                        maxLength: 30
+                                        example: 30 minutes
+                                      event_name:
+                                        type: string
+                                        maxLength: 20
+                                        example: Red Wine Tasting
+                                      event_type:
+                                        title: EventTypeEnum
+                                        x-tags:
+                                          - Enumeration
+                                        type: string
+                                        maxLength: 14
+                                        enum:
+                                          - No Charge
+                                          - Pay On Arrival
+                                          - Pay At Booking
+                                        example: Pay At Booking
+                                      host:
+                                        type: string
+                                        maxLength: 20
+                                        example: Joe Bob
+                                      location:
+                                        type: string
+                                        maxLength: 20
+                                        example: Library Room
+                                      price_per_reservation:
+                                        type: number
+                                        minimum: 0
+                                        maximum: 9999999.99
+                                      reservation_maximum:
+                                        type: integer
+                                        minimum: 0
+                                        maximum: 999999999
+                                      reservation_minimum:
+                                        type: integer
+                                        minimum: 0
+                                        maximum: 999999999
+                                      tax_per_reservation:
+                                        type: number
+                                        minimum: 0
+                                        maximum: 9999999.99
+    400BadParmsGetResponse:
+      description: The query parameters used in the query of the reservation_time_slots endpoint were invalid.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Query Parameters Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      potential_query_parameters:
+                        title: PotentialQueryParms
+                        type: array
+                        minItems: 1
+                        items:
+                          anyOf:
+                            - title: QueryParm1Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: FIXED_STRING_PARM
+                                parameter_type:
+                                  type: string
+                                  example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                parameter_notes:
+                                  type: string
+                                  example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                            - title: QueryParm2Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: STRING_SEARCH_PARM
+                                parameter_type:
+                                  type: string
+                                  example: String search parameter (generally contains type text search)
+                                parameter_notes:
+                                  type: string
+                                  example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                            - title: QueryParm3Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: NUMERIC_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Numeric parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                            - title: QueryParm4Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: DATE_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Date parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+    401UnauthorizedResponse:
+      description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+      content:
+        application/json:
+          schema:
+            title: Unauthorized - Invalid/Missing Authorization GUID Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    type: string
+                    example: Invalid authorization GUID.
+    403ForbiddenResponse:
+      description: The API User does not have access to the requested resource.
+      content:
+        application/json:
+          schema:
+            title: Forbidden - Access Not Permitted Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                required:
+                  - error_state
+                  - error_msg
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    oneOf:
+                      - title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      - title: InvalidImpersonationGuidMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: Invalid Impersonation Guid
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        oneOf:
+                          - title: NoApiAccessMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the called method on the called resource.
+                          - title: AmsUserImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the GET method on the dtc_orders API resource
+                          - title: DtcCustImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: 'When impersonating a DTC customer, only actions on that customer are allowed'

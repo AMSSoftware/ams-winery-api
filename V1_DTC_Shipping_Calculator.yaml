@@ -1,0 +1,532 @@
+openapi: 3.0.0
+info:
+  title: V1 AMS Winery DTC Shipping Calculator API
+  description: |
+    This API definition describes the API resource that exposes AMS shipping calculations. POST is the only valid HTTP method for this API resource.
+    <br/>
+    <h1>Version Control Scheme</h1>
+    <p>Versions will be relatively static, when breaking/logic changes occur a new version will
+    be created.</p>
+    <hr/>
+    <h1>Revision Log</h1>
+    <ul>
+    <li>2019-07-09 - KAS - Brand new.</li>
+    <li>2021-09-15 - KAS - Clean up, re-organize a bit, and import into Stoplight Studio/ReadMe. This involves the introduction of 'model' files, rather than the 'domains' that SwaggerHub allows for.</li>
+    </ul>
+  contact:
+    name: Helpdesk API Support
+    email: apisupport@amssoftware.com
+  license:
+    name: License Required
+    url: 'http://www.amssoftware.com'
+  version: 07-09-2019
+tags:
+  - name: DTCShippingOptionsPOST
+    description: GETs to the API resource that represents the exposure of AMS shipping calculations.
+servers:
+  - description: Development Server
+    url: 'https://thor2012-test.amscloudconnect.amssoftware.com/api'
+security:
+  - AMSBearerAuth: []
+paths:
+  /winery/v1/shipping_calculator:
+    post:
+      operationId: obtainV1DTCShippingOptions
+      tags:
+        - DTCShippingOptionsPOST
+      summary: Posting a collection of product IDs and quantities to obtain available shipping choices.
+      description: 'When a valid collection of product IDs and quantity information is provided along with appropriate URL parameters, a collection of shipping options for a shipment containing the provided products is returned.'
+      requestBody:
+        description: JSON body containing product and quantity information with which to calculate shipping options for a shipment.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - shipment_information
+              properties:
+                shipment_information:
+                  type: object
+                  required:
+                    - ship_to_state
+                    - customer_id
+                    - residence_flag
+                    - product_information
+                  properties:
+                    ship_to_state:
+                      type: string
+                      minLength: 2
+                      maxLength: 2
+                      example: CA
+                    system_id:
+                      type: string
+                      minLength: 3
+                      maxLength: 4
+                      example: AMS
+                    customer_id:
+                      type: integer
+                      minimum: 1
+                      maximum: 999999
+                      example: 100
+                    residence_flag:
+                      type: boolean
+                      example: true
+                    product_information:
+                      type: array
+                      minItems: 1
+                      maxItems: 99
+                      items:
+                        type: object
+                        required:
+                          - product_id
+                          - quantity
+                        properties:
+                          product_id:
+                            type: string
+                            minLength: 1
+                            maxLength: 20
+                            example: BNCS01
+                          quantity:
+                            type: integer
+                            minimum: 1
+                            maximum: 999999999
+                            example: 12
+      responses:
+        '200':
+          description: Successfully calculated shipping options for provided information.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          shipping_options:
+                            type: array
+                            minItems: 0
+                            maxItems: 64
+                            items:
+                              type: object
+                              properties:
+                                sort_priority:
+                                  type: string
+                                  maxLength: 2
+                                  example: '99'
+                                shipping_code:
+                                  type: string
+                                  maxLength: 4
+                                  example: FX01
+                                description:
+                                  type: string
+                                  maxLength: 30
+                                  example: Fed Ex Ground
+                                shipping_amount:
+                                  type: number
+                                  minimum: 0
+                                  maximum: 9999999.99
+                                  example: 14.95
+        '400':
+          description: The JSON body used in the POST request is invalid or one of the property values failed validation. Information will be provided indicating how to correct the issue.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Post Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        oneOf:
+                          - title: PropertyDataErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: There were validation errors with the JSON data passed in. See below array for error messages.
+                              property_data_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    property_data_error:
+                                      type: string
+                                      example: I have a problem with one of the property values that was passed in.
+                          - title: JsonValidationErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                              json_validation_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    json_validation_error:
+                                      type: string
+                                      example: I have a problem with the structure of the passed in JSON.
+                              example_object:
+                                title: ExampleObject
+                                type: object
+                                properties:
+                                  object_property_1:
+                                    type: string
+                                    example: Required string property; Maximum Length = 30; Object description.
+                                  object_property_2:
+                                    type: string
+                                    example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                                  object_property_3:
+                                    type: string
+                                    example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+components:
+  securitySchemes:
+    AMSBearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    ShipmentInformation:
+      type: object
+      required:
+        - shipment_information
+      properties:
+        shipment_information:
+          type: object
+          required:
+            - ship_to_state
+            - customer_id
+            - residence_flag
+            - product_information
+          properties:
+            ship_to_state:
+              type: string
+              minLength: 2
+              maxLength: 2
+              example: CA
+            system_id:
+              type: string
+              minLength: 3
+              maxLength: 4
+              example: AMS
+            customer_id:
+              type: integer
+              minimum: 1
+              maximum: 999999
+              example: 100
+            residence_flag:
+              type: boolean
+              example: true
+            product_information:
+              type: array
+              minItems: 1
+              maxItems: 99
+              items:
+                type: object
+                required:
+                  - product_id
+                  - quantity
+                properties:
+                  product_id:
+                    type: string
+                    minLength: 1
+                    maxLength: 20
+                    example: BNCS01
+                  quantity:
+                    type: integer
+                    minimum: 1
+                    maximum: 999999999
+                    example: 12
+    ShippingOptionsArray:
+      type: array
+      minItems: 0
+      maxItems: 64
+      items:
+        type: object
+        properties:
+          sort_priority:
+            type: string
+            maxLength: 2
+            example: '99'
+          shipping_code:
+            type: string
+            maxLength: 4
+            example: FX01
+          description:
+            type: string
+            maxLength: 30
+            example: Fed Ex Ground
+          shipping_amount:
+            type: number
+            minimum: 0
+            maximum: 9999999.99
+            example: 14.95
+    ShipmentInformationObject:
+      type: object
+      required:
+        - ship_to_state
+        - customer_id
+        - residence_flag
+        - product_information
+      properties:
+        ship_to_state:
+          type: string
+          minLength: 2
+          maxLength: 2
+          example: CA
+        system_id:
+          type: string
+          minLength: 3
+          maxLength: 4
+          example: AMS
+        customer_id:
+          type: integer
+          minimum: 1
+          maximum: 999999
+          example: 100
+        residence_flag:
+          type: boolean
+          example: true
+        product_information:
+          type: array
+          minItems: 1
+          maxItems: 99
+          items:
+            type: object
+            required:
+              - product_id
+              - quantity
+            properties:
+              product_id:
+                type: string
+                minLength: 1
+                maxLength: 20
+                example: BNCS01
+              quantity:
+                type: integer
+                minimum: 1
+                maximum: 999999999
+                example: 12
+  requestBodies:
+    ShippingCalculatorRequestBody:
+      description: JSON body containing product and quantity information with which to calculate shipping options for a shipment.
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - shipment_information
+            properties:
+              shipment_information:
+                type: object
+                required:
+                  - ship_to_state
+                  - customer_id
+                  - residence_flag
+                  - product_information
+                properties:
+                  ship_to_state:
+                    type: string
+                    minLength: 2
+                    maxLength: 2
+                    example: CA
+                  system_id:
+                    type: string
+                    minLength: 3
+                    maxLength: 4
+                    example: AMS
+                  customer_id:
+                    type: integer
+                    minimum: 1
+                    maximum: 999999
+                    example: 100
+                  residence_flag:
+                    type: boolean
+                    example: true
+                  product_information:
+                    type: array
+                    minItems: 1
+                    maxItems: 99
+                    items:
+                      type: object
+                      required:
+                        - product_id
+                        - quantity
+                      properties:
+                        product_id:
+                          type: string
+                          minLength: 1
+                          maxLength: 20
+                          example: BNCS01
+                        quantity:
+                          type: integer
+                          minimum: 1
+                          maximum: 999999999
+                          example: 12
+  responses:
+    200SuccessfulShippingCalculation:
+      description: Successfully calculated shipping options for provided information.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      shipping_options:
+                        type: array
+                        minItems: 0
+                        maxItems: 64
+                        items:
+                          type: object
+                          properties:
+                            sort_priority:
+                              type: string
+                              maxLength: 2
+                              example: '99'
+                            shipping_code:
+                              type: string
+                              maxLength: 4
+                              example: FX01
+                            description:
+                              type: string
+                              maxLength: 30
+                              example: Fed Ex Ground
+                            shipping_amount:
+                              type: number
+                              minimum: 0
+                              maximum: 9999999.99
+                              example: 14.95
+    400BadPostResponse:
+      description: The JSON body used in the POST request is invalid or one of the property values failed validation. Information will be provided indicating how to correct the issue.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Post Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    oneOf:
+                      - title: PropertyDataErrorResponse
+                        type: object
+                        properties:
+                          error_message:
+                            type: string
+                            example: There were validation errors with the JSON data passed in. See below array for error messages.
+                          property_data_errors:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              properties:
+                                property_data_error:
+                                  type: string
+                                  example: I have a problem with one of the property values that was passed in.
+                      - title: JsonValidationErrorResponse
+                        type: object
+                        properties:
+                          error_message:
+                            type: string
+                            example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                          json_validation_errors:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              properties:
+                                json_validation_error:
+                                  type: string
+                                  example: I have a problem with the structure of the passed in JSON.
+                          example_object:
+                            title: ExampleObject
+                            type: object
+                            properties:
+                              object_property_1:
+                                type: string
+                                example: Required string property; Maximum Length = 30; Object description.
+                              object_property_2:
+                                type: string
+                                example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                              object_property_3:
+                                type: string
+                                example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+    401UnauthorizedResponse:
+      description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+      content:
+        application/json:
+          schema:
+            title: Unauthorized - Invalid/Missing Authorization GUID Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    type: string
+                    example: Invalid authorization GUID.
