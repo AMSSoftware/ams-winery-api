@@ -4,7 +4,7 @@ info:
   description: |-
     This API definition describes authorization methods for use in conjunction with he other API definitions. <br/> The type of authorization required for a given API call is determined by the type of client consuming the API and the business context of the client application. <br/>
     <h1>Version Control Scheme</h1> <p>Versions will be relatively static, when breaking/logic changes occur a new version will be created.</p>
-    <h1>Revision Log:</h1> <hr/> 
+    <h1>Revision Log</h1> <hr/> 
     <ul> 
     <li>2019-02-12 - KAS - Brand new.</li> 
     <li>2020-11-25 - TWS - Add Warehouse Development Server.</li> 
