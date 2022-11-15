@@ -54,7 +54,7 @@ jobs:
       - name: GitHub Action
         uses: readmeio/rdme@8.0.4
         with:
-          rdme: openapi V1_DTC_Shipping_Calculator_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_DTC_SHIPPING_CALCULATOR_ID }}
+          rdme: openapi V1_DTC_Shipping_Calculator.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_DTC_SHIPPING_CALCULATOR_ID }}
         
       - name: GitHub Action
         uses: readmeio/rdme@8.0.4
