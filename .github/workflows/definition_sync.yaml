@@ -1,0 +1,67 @@
+name: Sync Auth OAS to ReadMe
+on:
+  push:
+    branches:
+      - master
+      - main
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the repo
+        uses: actions/checkout@v3
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi Authorization_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_AUTH_ID }}
+          
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_Code_Info_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_CODE_INFO_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_DTC_Orders_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_DTC_ORDERS_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_Products_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_PRODUCTS_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_DTC_Customers_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_DTC_CUSTOMERS_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V2_DTC_Orders_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V2_DTC_ORDERS_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_AP_Batches_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_AP_BATCHES_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_AP_Vendors_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_AP_VENDORS_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_DTC_Shipping_Calculator_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_DTC_SHIPPING_CALCULATOR_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_Reservation_Time_Slots_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_RESERVATION_TIME_SLOTS_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_Reservations_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_RESERVATIONS_ID }}
