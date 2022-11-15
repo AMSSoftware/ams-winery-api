@@ -17,6 +17,7 @@ info:
   contact:
     name: Helpdesk API Support
     email: apisupport@amssoftware.com
+    url: 'http://www.amssoftware.com'
   license:
     name: License Required
     url: 'http://www.amssoftware.com'
