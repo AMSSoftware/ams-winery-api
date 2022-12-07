@@ -25,11 +25,6 @@ tags:
     description: Impersonation as an AMS User
   - name: DtcCustomerImpersonation
     description: Impersonation as a DTC Customer
-servers:
-  - description: Winery Development Server
-    url: 'https://thor2012-test.amscloudconnect.amssoftware.com/api'
-  - description: Warehouse Development Server
-    url: 'https://thor2012-whse.amscloudconnect.amssoftware.com/api'
 paths:
   /authorize:
     post:
