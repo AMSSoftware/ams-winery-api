@@ -65,3 +65,8 @@ jobs:
         uses: readmeio/rdme@8.0.4
         with:
           rdme: openapi V1_Reservations_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_RESERVATIONS_ID }}
+        
+      - name: GitHub Action
+        uses: readmeio/rdme@8.0.4
+        with:
+          rdme: openapi V1_Winery_Webhooks_API.yaml --key=${{ secrets.README_WINERY_AUTH_KEY }} --id=${{ secrets.README_WINERY_V1_WEBHOOKS_ID }}
