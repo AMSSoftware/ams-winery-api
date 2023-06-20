@@ -1,0 +1,2720 @@
+openapi: 3.0.0
+info:
+  title: V1 AMS Winery Webhook API
+  description: |
+    RESTful API access to a resource that provides the ability to create webhooks on winery resources. These webhooks allow API consumers to request notification of changes to select items in the winery DB.
+    <br/>
+    <h1>Version Control Scheme</h1>
+    <p>Versions will be relatively static, when breaking/logic changes occur a 
+    new version will be created.</p>
+    <hr/>
+    <h1>Revision Log</h1>
+    <ul>
+    <li>2023-06-20 - KAS - Brand new. Cloned from warehouse code_info resource.</li>
+    </ul>
+  contact:
+    name: Helpdesk API Support
+    email: apisupport@amssoftware.com
+    url: 'http://www.amssoftware.com'
+  license:
+    name: License Required
+    url: 'http://www.amssoftware.com'
+  version: '2023-06-07'
+servers:
+  - description: Development Server
+    url: 'https://thor2012-test.amscloudconnect.amssoftware.com/api'
+security:
+  - AMSBearerAuth: []
+tags:
+  - name: WebhookGET
+    description: GETs to the API resource allow for information about webhooks to be retrieved.
+  - name: WebhookPOST
+    description: POSTs to the API resource allow for the creation of webhooks.
+  - name: WebhookPATCH
+    description: PATCHs to the API resource allow for the editing of webhooks.
+  - name: WebhookDELETE
+    description: DELETEs to the API resource allow for the deletion of webhooks.
+paths:
+  /winery/v1/webhook:
+    get:
+      operationId: getWineryWebhooks
+      tags:
+        - WebhookGET
+      summary: Gets client's webhooks.
+      description: When a GET is issued to the webhook endpoint will provide information about currently defined web hooks for the current API client.
+      responses:
+        '200':
+          description: Ok - The query of the warehouse webhooks resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              webhooks_found:
+                                type: integer
+                                example: 1
+                              webhooks:
+                                type: array
+                                items:
+                                  title: V1GETWebhookObject
+                                  type: object
+                                  properties:
+                                    api_resource_endpoint:
+                                      type: string
+                                      maxLength: 64
+                                      example: warehouse/v1/orders/1234-0
+                                    creation_date:
+                                      type: string
+                                      maxLength: 10
+                                      minLength: 10
+                                      example: 01/01/2023
+                                    creation_time:
+                                      type: string
+                                      maxLength: 8
+                                      minLength: 8
+                                      example: '12:00:00'
+                                    expiration_date:
+                                      type: string
+                                      maxLength: 10
+                                      minLength: 10
+                                      example: 01/01/2023
+                                    notification_on_add:
+                                      type: boolean
+                                      example: true
+                                    notification_on_change:
+                                      type: boolean
+                                      example: true
+                                    notification_on_delete:
+                                      type: boolean
+                                      example: true
+                                    revised_date:
+                                      type: string
+                                      maxLength: 10
+                                      minLength: 10
+                                      example: 01/01/2023
+                                    revised_time:
+                                      type: string
+                                      maxLength: 8
+                                      minLength: 8
+                                      example: '12:00:00'
+                                    webhook_id:
+                                      type: integer
+                                      minimum: 1
+                                      maximum: 999999999
+                                      example: 1234
+                                    webhook_priority:
+                                      title: WebhookPriorityEnum
+                                      x-tags:
+                                        - Enumeration
+                                        - Webhook
+                                      type: string
+                                      enum:
+                                        - High
+                                        - Normal
+                                        - Low
+                                      maxLength: 6
+                                      example: Normal
+                                    webhook_status:
+                                      title: WebhookStatusEnum
+                                      x-tags:
+                                        - Enumeration
+                                        - Webhook
+                                      type: string
+                                      enum:
+                                        - Active
+                                        - Expired
+                                        - Canceled
+                                      maxLength: 8
+                                      example: Active
+        '400':
+          description: The query parameters used in the query of the webhook endpoint were invalid.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Query Parameters Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          potential_query_parameters:
+                            title: PotentialQueryParms
+                            type: array
+                            minItems: 1
+                            items:
+                              anyOf:
+                                - title: QueryParm1Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: FIXED_STRING_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                    parameter_notes:
+                                      type: string
+                                      example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                                - title: QueryParm2Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: STRING_SEARCH_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: String search parameter (generally contains type text search)
+                                    parameter_notes:
+                                      type: string
+                                      example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                                - title: QueryParm3Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: NUMERIC_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Numeric parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                                - title: QueryParm4Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: DATE_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Date parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+    post:
+      operationId: addWineryWebhook
+      tags:
+        - WebhookPOST
+      summary: Creates a webhook on a winery resource in the AMS database.
+      description: When a POST is issued to the webhook endpoint will create a webhook for the current API client with the information provided in the JSON body.
+      requestBody:
+        description: Request body for posting a winery webhook resource to the database. All components of the object are required to be present. Components with a non-zero minimum length require a value.
+        required: true
+        content:
+          application/json:
+            schema:
+              title: V1PostWebhookObject
+              type: object
+              properties:
+                api_resource_endpoint:
+                  type: string
+                  maxLength: 64
+                  example: warehouse/v1/orders/1234-0
+                expiration_date:
+                  type: string
+                  maxLength: 10
+                  minLength: 10
+                  example: 01/01/2023
+                notification_on_add:
+                  type: boolean
+                  example: true
+                notification_on_change:
+                  type: boolean
+                  example: true
+                notification_on_delete:
+                  type: boolean
+                  example: true
+                webhook_priority:
+                  title: WebhookPriorityEnum
+                  x-tags:
+                    - Enumeration
+                    - Webhook
+                  type: string
+                  enum:
+                    - High
+                    - Normal
+                    - Low
+                  maxLength: 6
+                  example: Normal
+      responses:
+        '201':
+          description: Created - The provided webhook data was valid and a new webhook resource was created.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          webhook:
+                            title: V1GETWebhookObject
+                            type: object
+                            properties:
+                              api_resource_endpoint:
+                                type: string
+                                maxLength: 64
+                                example: warehouse/v1/orders/1234-0
+                              creation_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              creation_time:
+                                type: string
+                                maxLength: 8
+                                minLength: 8
+                                example: '12:00:00'
+                              expiration_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              notification_on_add:
+                                type: boolean
+                                example: true
+                              notification_on_change:
+                                type: boolean
+                                example: true
+                              notification_on_delete:
+                                type: boolean
+                                example: true
+                              revised_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              revised_time:
+                                type: string
+                                maxLength: 8
+                                minLength: 8
+                                example: '12:00:00'
+                              webhook_id:
+                                type: integer
+                                minimum: 1
+                                maximum: 999999999
+                                example: 1234
+                              webhook_priority:
+                                title: WebhookPriorityEnum
+                                x-tags:
+                                  - Enumeration
+                                  - Webhook
+                                type: string
+                                enum:
+                                  - High
+                                  - Normal
+                                  - Low
+                                maxLength: 6
+                                example: Normal
+                              webhook_status:
+                                title: WebhookStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                  - Webhook
+                                type: string
+                                enum:
+                                  - Active
+                                  - Expired
+                                  - Canceled
+                                maxLength: 8
+                                example: Active
+        '400':
+          description: The JSON body used in the POST request is invalid or one of the property values failed validation. Information will be provided indicating how to correct the issue.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Post Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        oneOf:
+                          - title: PropertyDataErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: There were validation errors with the JSON data passed in. See below array for error messages.
+                              property_data_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    property_data_error:
+                                      type: string
+                                      example: I have a problem with one of the property values that was passed in.
+                          - title: JsonValidationErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                              json_validation_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    json_validation_error:
+                                      type: string
+                                      example: I have a problem with the structure of the passed in JSON.
+                              example_object:
+                                title: ExampleObject
+                                type: object
+                                properties:
+                                  object_property_1:
+                                    type: string
+                                    example: Required string property; Maximum Length = 30; Object description.
+                                  object_property_2:
+                                    type: string
+                                    example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                                  object_property_3:
+                                    type: string
+                                    example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+  '/winery/v1/{webhook_id}':
+    get:
+      operationId: getWineryWebhook
+      tags:
+        - WebhookGET
+      summary: Gets the webhook specified by the provided webhook_id.
+      description: 'When a GET is issued to the webhook endpoint with a webhook_id, the specific webhook is returned if it exists and belongs to the current API client'
+      parameters:
+        - name: webhook_id
+          in: path
+          description: This parameter in the path represents the unique ID of a given winery webhook.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ok - The GET against a specific warehouse webhook resource was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          webhook:
+                            title: V1GETWebhookObject
+                            type: object
+                            properties:
+                              api_resource_endpoint:
+                                type: string
+                                maxLength: 64
+                                example: warehouse/v1/orders/1234-0
+                              creation_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              creation_time:
+                                type: string
+                                maxLength: 8
+                                minLength: 8
+                                example: '12:00:00'
+                              expiration_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              notification_on_add:
+                                type: boolean
+                                example: true
+                              notification_on_change:
+                                type: boolean
+                                example: true
+                              notification_on_delete:
+                                type: boolean
+                                example: true
+                              revised_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              revised_time:
+                                type: string
+                                maxLength: 8
+                                minLength: 8
+                                example: '12:00:00'
+                              webhook_id:
+                                type: integer
+                                minimum: 1
+                                maximum: 999999999
+                                example: 1234
+                              webhook_priority:
+                                title: WebhookPriorityEnum
+                                x-tags:
+                                  - Enumeration
+                                  - Webhook
+                                type: string
+                                enum:
+                                  - High
+                                  - Normal
+                                  - Low
+                                maxLength: 6
+                                example: Normal
+                              webhook_status:
+                                title: WebhookStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                  - Webhook
+                                type: string
+                                enum:
+                                  - Active
+                                  - Expired
+                                  - Canceled
+                                maxLength: 8
+                                example: Active
+        '400':
+          description: The query parameters used in the query of the webhook endpoint were invalid.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Query Parameters Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          potential_query_parameters:
+                            title: PotentialQueryParms
+                            type: array
+                            minItems: 1
+                            items:
+                              anyOf:
+                                - title: QueryParm1Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: FIXED_STRING_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                    parameter_notes:
+                                      type: string
+                                      example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                                - title: QueryParm2Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: STRING_SEARCH_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: String search parameter (generally contains type text search)
+                                    parameter_notes:
+                                      type: string
+                                      example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                                - title: QueryParm3Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: NUMERIC_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Numeric parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                                - title: QueryParm4Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: DATE_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Date parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+    patch:
+      operationId: updateWineryWebhook
+      tags:
+        - WebhookPATCH
+      summary: Patches a specific winery webhook specified by the provided webhook_id
+      description: A PATCH to the webhook resource allows the editing of certain information about the webhook if it exists and belongs to the current API client.
+      parameters:
+        - name: webhook_id
+          in: path
+          description: This parameter in the path represents the unique ID of a given winery webhook.
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        description: Request body for patching a winery webhook resource in the database. Only components to be updated/edited should be passed in the request body. Components with a non-zero minimum length require a value.
+        required: true
+        content:
+          application/json:
+            schema:
+              title: V1PATCHWebhookObject
+              type: object
+              properties:
+                expiration_date:
+                  type: string
+                  maxLength: 10
+                  minLength: 10
+                  example: 01/01/2023
+                notification_on_add:
+                  type: boolean
+                  example: true
+                notification_on_change:
+                  type: boolean
+                  example: true
+                notification_on_delete:
+                  type: boolean
+                  example: true
+                webhook_priority:
+                  title: WebhookPriorityEnum
+                  x-tags:
+                    - Enumeration
+                    - Webhook
+                  type: string
+                  enum:
+                    - High
+                    - Normal
+                    - Low
+                  maxLength: 6
+                  example: Normal
+      responses:
+        '200':
+          description: OK - The provided webhook data was valid and the existing webhook resource was patched.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          webhook:
+                            title: V1GETWebhookObject
+                            type: object
+                            properties:
+                              api_resource_endpoint:
+                                type: string
+                                maxLength: 64
+                                example: warehouse/v1/orders/1234-0
+                              creation_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              creation_time:
+                                type: string
+                                maxLength: 8
+                                minLength: 8
+                                example: '12:00:00'
+                              expiration_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              notification_on_add:
+                                type: boolean
+                                example: true
+                              notification_on_change:
+                                type: boolean
+                                example: true
+                              notification_on_delete:
+                                type: boolean
+                                example: true
+                              revised_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              revised_time:
+                                type: string
+                                maxLength: 8
+                                minLength: 8
+                                example: '12:00:00'
+                              webhook_id:
+                                type: integer
+                                minimum: 1
+                                maximum: 999999999
+                                example: 1234
+                              webhook_priority:
+                                title: WebhookPriorityEnum
+                                x-tags:
+                                  - Enumeration
+                                  - Webhook
+                                type: string
+                                enum:
+                                  - High
+                                  - Normal
+                                  - Low
+                                maxLength: 6
+                                example: Normal
+                              webhook_status:
+                                title: WebhookStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                  - Webhook
+                                type: string
+                                enum:
+                                  - Active
+                                  - Expired
+                                  - Canceled
+                                maxLength: 8
+                                example: Active
+        '400':
+          description: The JSON body used in the PATCH request is invalid or one the property values failed validation. Information will be provided indicating how to correct the issue.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Patch Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        oneOf:
+                          - title: PropertyDataErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: There were validation errors with the JSON data passed in. See below array for error messages.
+                              property_data_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    property_data_error:
+                                      type: string
+                                      example: I have a problem with one of the property values that was passed in.
+                          - title: JsonValidationErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                              json_validation_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    json_validation_error:
+                                      type: string
+                                      example: I have a problem with the structure of the passed in JSON.
+                              example_object:
+                                title: ExampleObject
+                                type: object
+                                properties:
+                                  object_property_1:
+                                    type: string
+                                    example: Required string property; Maximum Length = 30; Object description.
+                                  object_property_2:
+                                    type: string
+                                    example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                                  object_property_3:
+                                    type: string
+                                    example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+    delete:
+      operationId: deleteWineryWebhook
+      tags:
+        - WebhookDELETE
+      summary: Deletes a specific winery webhook specified by the provided webhook_id
+      description: A DELETE to the webhook resource removes the specified webhook from the API resource if it exists and belongs to the current API client.
+      parameters:
+        - name: webhook_id
+          in: path
+          description: This parameter in the path represents the unique ID of a given winery webhook.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Ok - The provided webhook_id was valid and the webhook resource was successfully deleted.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+  /winery/v1/webhook/types:
+    get:
+      operationId: getWineryWebhookTypes
+      tags:
+        - WebhookGET
+      summary: Gets the types of available winery webhooks.
+      description: When a GET is issued to the webhook/types endpoint will provide information about currently available winery webhooks.
+      responses:
+        '200':
+          description: Ok - The query of the warehouse webhook types was successful.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          query_results:
+                            type: object
+                            properties:
+                              webhook_types_found:
+                                type: integer
+                                example: 1
+                              webhook_types:
+                                type: array
+                                items:
+                                  title: V1GETWebhookType
+                                  type: object
+                                  properties:
+                                    webhook_type:
+                                      type: string
+                                      example: warehouse/ship_customers
+        '400':
+          description: The query parameters used in the query of the webhook endpoint were invalid.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Query Parameters Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          potential_query_parameters:
+                            title: PotentialQueryParms
+                            type: array
+                            minItems: 1
+                            items:
+                              anyOf:
+                                - title: QueryParm1Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: FIXED_STRING_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                    parameter_notes:
+                                      type: string
+                                      example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                                - title: QueryParm2Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: STRING_SEARCH_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: String search parameter (generally contains type text search)
+                                    parameter_notes:
+                                      type: string
+                                      example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                                - title: QueryParm3Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: NUMERIC_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Numeric parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                                - title: QueryParm4Object
+                                  type: object
+                                  properties:
+                                    parameter_name:
+                                      type: string
+                                      example: DATE_PARM
+                                    parameter_type:
+                                      type: string
+                                      example: Date parameter
+                                    parameter_notes:
+                                      type: string
+                                      example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+  '/winery/v1/webhook/renew/{webhook_id}':
+    patch:
+      operationId: renewWineryWebhook
+      tags:
+        - WebhookPATCH
+      summary: Renews the expiration date for a winery webhook.
+      description: A PATCH to the webhook/renew endpoint with a specific unique webhook ID will renew an expired webhook if it belongs to the current API client.
+      requestBody:
+        description: Request body for renewing a winery webhook resource in the database.
+        required: true
+        content:
+          application/json:
+            schema:
+              title: V1PATCHWebhookObject
+              type: object
+              properties:
+                expiration_date:
+                  type: string
+                  maxLength: 10
+                  minLength: 10
+                  example: 01/01/2023
+      parameters:
+        - name: webhook_id
+          in: path
+          description: This parameter in the path represents the unique ID of a given winery webhook.
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: OK - The provided webhook data was valid and the existing webhook resource was renewed.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: false
+                      endpoint_response:
+                        type: object
+                        properties:
+                          webhook:
+                            title: V1GETWebhookObject
+                            type: object
+                            properties:
+                              api_resource_endpoint:
+                                type: string
+                                maxLength: 64
+                                example: warehouse/v1/orders/1234-0
+                              creation_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              creation_time:
+                                type: string
+                                maxLength: 8
+                                minLength: 8
+                                example: '12:00:00'
+                              expiration_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              notification_on_add:
+                                type: boolean
+                                example: true
+                              notification_on_change:
+                                type: boolean
+                                example: true
+                              notification_on_delete:
+                                type: boolean
+                                example: true
+                              revised_date:
+                                type: string
+                                maxLength: 10
+                                minLength: 10
+                                example: 01/01/2023
+                              revised_time:
+                                type: string
+                                maxLength: 8
+                                minLength: 8
+                                example: '12:00:00'
+                              webhook_id:
+                                type: integer
+                                minimum: 1
+                                maximum: 999999999
+                                example: 1234
+                              webhook_priority:
+                                title: WebhookPriorityEnum
+                                x-tags:
+                                  - Enumeration
+                                  - Webhook
+                                type: string
+                                enum:
+                                  - High
+                                  - Normal
+                                  - Low
+                                maxLength: 6
+                                example: Normal
+                              webhook_status:
+                                title: WebhookStatusEnum
+                                x-tags:
+                                  - Enumeration
+                                  - Webhook
+                                type: string
+                                enum:
+                                  - Active
+                                  - Expired
+                                  - Canceled
+                                maxLength: 8
+                                example: Active
+        '400':
+          description: The JSON body used in the PATCH request is invalid or one the property values failed validation. Information will be provided indicating how to correct the issue.
+          content:
+            application/json:
+              schema:
+                title: Bad Request - Invalid Patch Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        oneOf:
+                          - title: PropertyDataErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: There were validation errors with the JSON data passed in. See below array for error messages.
+                              property_data_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    property_data_error:
+                                      type: string
+                                      example: I have a problem with one of the property values that was passed in.
+                          - title: JsonValidationErrorResponse
+                            type: object
+                            properties:
+                              error_message:
+                                type: string
+                                example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                              json_validation_errors:
+                                type: array
+                                minItems: 1
+                                items:
+                                  type: object
+                                  properties:
+                                    json_validation_error:
+                                      type: string
+                                      example: I have a problem with the structure of the passed in JSON.
+                              example_object:
+                                title: ExampleObject
+                                type: object
+                                properties:
+                                  object_property_1:
+                                    type: string
+                                    example: Required string property; Maximum Length = 30; Object description.
+                                  object_property_2:
+                                    type: string
+                                    example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                                  object_property_3:
+                                    type: string
+                                    example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+        '401':
+          description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+          content:
+            application/json:
+              schema:
+                title: Unauthorized - Invalid/Missing Authorization GUID Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        type: string
+                        example: Invalid authorization GUID.
+        '403':
+          description: The API User does not have access to the requested resource.
+          content:
+            application/json:
+              schema:
+                title: Forbidden - Access Not Permitted Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    required:
+                      - error_state
+                      - error_msg
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        oneOf:
+                          - title: HandlerHttpErrorMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: The API handler indicated an error condition via the HTTP return code.
+                          - title: InvalidImpersonationGuidMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: Invalid Impersonation Guid
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            oneOf:
+                              - title: NoApiAccessMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the called method on the called resource.
+                              - title: AmsUserImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: User does not have access to the GET method on the dtc_orders API resource
+                              - title: DtcCustImpersonationFailureMessage
+                                x-tags:
+                                  - Message
+                                type: string
+                                example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+        '404':
+          description: The requested API resource does not exist.
+          content:
+            application/json:
+              schema:
+                title: Not Found - Resource Does Not Exist Response
+                x-tags:
+                  - FailureResponse
+                type: object
+                properties:
+                  ams_api_response:
+                    type: object
+                    properties:
+                      error_state:
+                        type: boolean
+                        example: true
+                      error_msg:
+                        title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      endpoint_response:
+                        type: object
+                        properties:
+                          error_msg:
+                            title: ResourceNotFoundMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: API resource with provided ID not found.
+components:
+  securitySchemes:
+    AMSBearerAuth:
+      type: http
+      scheme: bearer
+  parameters:
+    WebhookIdParm:
+      name: webhook_id
+      in: path
+      description: This parameter in the path represents the unique ID of a given winery webhook.
+      required: true
+      schema:
+        type: integer
+  requestBodies:
+    V1WebhookPostRequestBody:
+      description: Request body for posting a winery webhook resource to the database. All components of the object are required to be present. Components with a non-zero minimum length require a value.
+      required: true
+      content:
+        application/json:
+          schema:
+            title: V1PostWebhookObject
+            type: object
+            properties:
+              api_resource_endpoint:
+                type: string
+                maxLength: 64
+                example: warehouse/v1/orders/1234-0
+              expiration_date:
+                type: string
+                maxLength: 10
+                minLength: 10
+                example: 01/01/2023
+              notification_on_add:
+                type: boolean
+                example: true
+              notification_on_change:
+                type: boolean
+                example: true
+              notification_on_delete:
+                type: boolean
+                example: true
+              webhook_priority:
+                title: WebhookPriorityEnum
+                x-tags:
+                  - Enumeration
+                  - Webhook
+                type: string
+                enum:
+                  - High
+                  - Normal
+                  - Low
+                maxLength: 6
+                example: Normal
+    V1WebhookPatchRequestBody:
+      description: Request body for patching a winery webhook resource in the database. Only components to be updated/edited should be passed in the request body. Components with a non-zero minimum length require a value.
+      required: true
+      content:
+        application/json:
+          schema:
+            title: V1PATCHWebhookObject
+            type: object
+            properties:
+              expiration_date:
+                type: string
+                maxLength: 10
+                minLength: 10
+                example: 01/01/2023
+              notification_on_add:
+                type: boolean
+                example: true
+              notification_on_change:
+                type: boolean
+                example: true
+              notification_on_delete:
+                type: boolean
+                example: true
+              webhook_priority:
+                title: WebhookPriorityEnum
+                x-tags:
+                  - Enumeration
+                  - Webhook
+                type: string
+                enum:
+                  - High
+                  - Normal
+                  - Low
+                maxLength: 6
+                example: Normal
+    V1WebhookRenewPatchRequestBody:
+      description: Request body for renewing a winery webhook resource in the database.
+      required: true
+      content:
+        application/json:
+          schema:
+            title: V1PATCHWebhookObject
+            type: object
+            properties:
+              expiration_date:
+                type: string
+                maxLength: 10
+                minLength: 10
+                example: 01/01/2023
+  responses:
+    200SuccessfulV1WebhooksGet:
+      description: Ok - The query of the warehouse webhooks resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          webhooks_found:
+                            type: integer
+                            example: 1
+                          webhooks:
+                            type: array
+                            items:
+                              title: V1GETWebhookObject
+                              type: object
+                              properties:
+                                api_resource_endpoint:
+                                  type: string
+                                  maxLength: 64
+                                  example: warehouse/v1/orders/1234-0
+                                creation_date:
+                                  type: string
+                                  maxLength: 10
+                                  minLength: 10
+                                  example: 01/01/2023
+                                creation_time:
+                                  type: string
+                                  maxLength: 8
+                                  minLength: 8
+                                  example: '12:00:00'
+                                expiration_date:
+                                  type: string
+                                  maxLength: 10
+                                  minLength: 10
+                                  example: 01/01/2023
+                                notification_on_add:
+                                  type: boolean
+                                  example: true
+                                notification_on_change:
+                                  type: boolean
+                                  example: true
+                                notification_on_delete:
+                                  type: boolean
+                                  example: true
+                                revised_date:
+                                  type: string
+                                  maxLength: 10
+                                  minLength: 10
+                                  example: 01/01/2023
+                                revised_time:
+                                  type: string
+                                  maxLength: 8
+                                  minLength: 8
+                                  example: '12:00:00'
+                                webhook_id:
+                                  type: integer
+                                  minimum: 1
+                                  maximum: 999999999
+                                  example: 1234
+                                webhook_priority:
+                                  title: WebhookPriorityEnum
+                                  x-tags:
+                                    - Enumeration
+                                    - Webhook
+                                  type: string
+                                  enum:
+                                    - High
+                                    - Normal
+                                    - Low
+                                  maxLength: 6
+                                  example: Normal
+                                webhook_status:
+                                  title: WebhookStatusEnum
+                                  x-tags:
+                                    - Enumeration
+                                    - Webhook
+                                  type: string
+                                  enum:
+                                    - Active
+                                    - Expired
+                                    - Canceled
+                                  maxLength: 8
+                                  example: Active
+    200SuccessfulV1WebhookGet:
+      description: Ok - The GET against a specific warehouse webhook resource was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      webhook:
+                        title: V1GETWebhookObject
+                        type: object
+                        properties:
+                          api_resource_endpoint:
+                            type: string
+                            maxLength: 64
+                            example: warehouse/v1/orders/1234-0
+                          creation_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          creation_time:
+                            type: string
+                            maxLength: 8
+                            minLength: 8
+                            example: '12:00:00'
+                          expiration_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          notification_on_add:
+                            type: boolean
+                            example: true
+                          notification_on_change:
+                            type: boolean
+                            example: true
+                          notification_on_delete:
+                            type: boolean
+                            example: true
+                          revised_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          revised_time:
+                            type: string
+                            maxLength: 8
+                            minLength: 8
+                            example: '12:00:00'
+                          webhook_id:
+                            type: integer
+                            minimum: 1
+                            maximum: 999999999
+                            example: 1234
+                          webhook_priority:
+                            title: WebhookPriorityEnum
+                            x-tags:
+                              - Enumeration
+                              - Webhook
+                            type: string
+                            enum:
+                              - High
+                              - Normal
+                              - Low
+                            maxLength: 6
+                            example: Normal
+                          webhook_status:
+                            title: WebhookStatusEnum
+                            x-tags:
+                              - Enumeration
+                              - Webhook
+                            type: string
+                            enum:
+                              - Active
+                              - Expired
+                              - Canceled
+                            maxLength: 8
+                            example: Active
+    200SuccessfulV1WebhookTypesGet:
+      description: Ok - The query of the warehouse webhook types was successful.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      query_results:
+                        type: object
+                        properties:
+                          webhook_types_found:
+                            type: integer
+                            example: 1
+                          webhook_types:
+                            type: array
+                            items:
+                              title: V1GETWebhookType
+                              type: object
+                              properties:
+                                webhook_type:
+                                  type: string
+                                  example: warehouse/ship_customers
+    201SuccessfulV1WebhookPost:
+      description: Created - The provided webhook data was valid and a new webhook resource was created.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      webhook:
+                        title: V1GETWebhookObject
+                        type: object
+                        properties:
+                          api_resource_endpoint:
+                            type: string
+                            maxLength: 64
+                            example: warehouse/v1/orders/1234-0
+                          creation_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          creation_time:
+                            type: string
+                            maxLength: 8
+                            minLength: 8
+                            example: '12:00:00'
+                          expiration_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          notification_on_add:
+                            type: boolean
+                            example: true
+                          notification_on_change:
+                            type: boolean
+                            example: true
+                          notification_on_delete:
+                            type: boolean
+                            example: true
+                          revised_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          revised_time:
+                            type: string
+                            maxLength: 8
+                            minLength: 8
+                            example: '12:00:00'
+                          webhook_id:
+                            type: integer
+                            minimum: 1
+                            maximum: 999999999
+                            example: 1234
+                          webhook_priority:
+                            title: WebhookPriorityEnum
+                            x-tags:
+                              - Enumeration
+                              - Webhook
+                            type: string
+                            enum:
+                              - High
+                              - Normal
+                              - Low
+                            maxLength: 6
+                            example: Normal
+                          webhook_status:
+                            title: WebhookStatusEnum
+                            x-tags:
+                              - Enumeration
+                              - Webhook
+                            type: string
+                            enum:
+                              - Active
+                              - Expired
+                              - Canceled
+                            maxLength: 8
+                            example: Active
+    200SuccessfulV1WebhookPatch:
+      description: OK - The provided webhook data was valid and the existing webhook resource was patched.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      webhook:
+                        title: V1GETWebhookObject
+                        type: object
+                        properties:
+                          api_resource_endpoint:
+                            type: string
+                            maxLength: 64
+                            example: warehouse/v1/orders/1234-0
+                          creation_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          creation_time:
+                            type: string
+                            maxLength: 8
+                            minLength: 8
+                            example: '12:00:00'
+                          expiration_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          notification_on_add:
+                            type: boolean
+                            example: true
+                          notification_on_change:
+                            type: boolean
+                            example: true
+                          notification_on_delete:
+                            type: boolean
+                            example: true
+                          revised_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          revised_time:
+                            type: string
+                            maxLength: 8
+                            minLength: 8
+                            example: '12:00:00'
+                          webhook_id:
+                            type: integer
+                            minimum: 1
+                            maximum: 999999999
+                            example: 1234
+                          webhook_priority:
+                            title: WebhookPriorityEnum
+                            x-tags:
+                              - Enumeration
+                              - Webhook
+                            type: string
+                            enum:
+                              - High
+                              - Normal
+                              - Low
+                            maxLength: 6
+                            example: Normal
+                          webhook_status:
+                            title: WebhookStatusEnum
+                            x-tags:
+                              - Enumeration
+                              - Webhook
+                            type: string
+                            enum:
+                              - Active
+                              - Expired
+                              - Canceled
+                            maxLength: 8
+                            example: Active
+    200SuccessfulV1WebhookDelete:
+      description: Ok - The provided webhook_id was valid and the webhook resource was successfully deleted.
+    200SuccessfulV1WebhookRenew:
+      description: OK - The provided webhook data was valid and the existing webhook resource was renewed.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: false
+                  endpoint_response:
+                    type: object
+                    properties:
+                      webhook:
+                        title: V1GETWebhookObject
+                        type: object
+                        properties:
+                          api_resource_endpoint:
+                            type: string
+                            maxLength: 64
+                            example: warehouse/v1/orders/1234-0
+                          creation_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          creation_time:
+                            type: string
+                            maxLength: 8
+                            minLength: 8
+                            example: '12:00:00'
+                          expiration_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          notification_on_add:
+                            type: boolean
+                            example: true
+                          notification_on_change:
+                            type: boolean
+                            example: true
+                          notification_on_delete:
+                            type: boolean
+                            example: true
+                          revised_date:
+                            type: string
+                            maxLength: 10
+                            minLength: 10
+                            example: 01/01/2023
+                          revised_time:
+                            type: string
+                            maxLength: 8
+                            minLength: 8
+                            example: '12:00:00'
+                          webhook_id:
+                            type: integer
+                            minimum: 1
+                            maximum: 999999999
+                            example: 1234
+                          webhook_priority:
+                            title: WebhookPriorityEnum
+                            x-tags:
+                              - Enumeration
+                              - Webhook
+                            type: string
+                            enum:
+                              - High
+                              - Normal
+                              - Low
+                            maxLength: 6
+                            example: Normal
+                          webhook_status:
+                            title: WebhookStatusEnum
+                            x-tags:
+                              - Enumeration
+                              - Webhook
+                            type: string
+                            enum:
+                              - Active
+                              - Expired
+                              - Canceled
+                            maxLength: 8
+                            example: Active
+    400BadParmsGetResponse:
+      description: The query parameters used in the query of the webhook endpoint were invalid.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Query Parameters Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      potential_query_parameters:
+                        title: PotentialQueryParms
+                        type: array
+                        minItems: 1
+                        items:
+                          anyOf:
+                            - title: QueryParm1Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: FIXED_STRING_PARM
+                                parameter_type:
+                                  type: string
+                                  example: 'Standard parameter (fixed values, see further messaging in the parameter_notes)'
+                                parameter_notes:
+                                  type: string
+                                  example: This fixed string parm represents a parameter that must have one of a discrete number of possible values. This message will contain information about the possible values.
+                            - title: QueryParm2Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: STRING_SEARCH_PARM
+                                parameter_type:
+                                  type: string
+                                  example: String search parameter (generally contains type text search)
+                                parameter_notes:
+                                  type: string
+                                  example: 'This string_search_parm represents a parameter the will use some form of text matching to limit results. Generally, the text search methodology will be of the contains type, however, the returned notes will specify the type of search methodology.'
+                            - title: QueryParm3Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: NUMERIC_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Numeric parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This numeric_parm represents a parameter that will be compared to some numeric property of an API resource. There are three formats form numeric values and each indicates a different type of numeric comparison. >999 represents a greater than search. <999 represents a less than search. 999-1000 represents an inclusive range search.
+                            - title: QueryParm4Object
+                              type: object
+                              properties:
+                                parameter_name:
+                                  type: string
+                                  example: DATE_PARM
+                                parameter_type:
+                                  type: string
+                                  example: Date parameter
+                                parameter_notes:
+                                  type: string
+                                  example: This date_parm represents a parameter that will be compared to some date property of an API resource. There are three formats form date values and each indicates a different type of date comparison. >MMDDYY represents a greater than date search. <MMDDYY represents a less than date search. MMDDYY-MMDDYY represents an inclusive date range search.
+    400BadPostResponse:
+      description: The JSON body used in the POST request is invalid or one of the property values failed validation. Information will be provided indicating how to correct the issue.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Post Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    oneOf:
+                      - title: PropertyDataErrorResponse
+                        type: object
+                        properties:
+                          error_message:
+                            type: string
+                            example: There were validation errors with the JSON data passed in. See below array for error messages.
+                          property_data_errors:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              properties:
+                                property_data_error:
+                                  type: string
+                                  example: I have a problem with one of the property values that was passed in.
+                      - title: JsonValidationErrorResponse
+                        type: object
+                        properties:
+                          error_message:
+                            type: string
+                            example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                          json_validation_errors:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              properties:
+                                json_validation_error:
+                                  type: string
+                                  example: I have a problem with the structure of the passed in JSON.
+                          example_object:
+                            title: ExampleObject
+                            type: object
+                            properties:
+                              object_property_1:
+                                type: string
+                                example: Required string property; Maximum Length = 30; Object description.
+                              object_property_2:
+                                type: string
+                                example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                              object_property_3:
+                                type: string
+                                example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+    400BadPatchResponse:
+      description: The JSON body used in the PATCH request is invalid or one the property values failed validation. Information will be provided indicating how to correct the issue.
+      content:
+        application/json:
+          schema:
+            title: Bad Request - Invalid Patch Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    oneOf:
+                      - title: PropertyDataErrorResponse
+                        type: object
+                        properties:
+                          error_message:
+                            type: string
+                            example: There were validation errors with the JSON data passed in. See below array for error messages.
+                          property_data_errors:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              properties:
+                                property_data_error:
+                                  type: string
+                                  example: I have a problem with one of the property values that was passed in.
+                      - title: JsonValidationErrorResponse
+                        type: object
+                        properties:
+                          error_message:
+                            type: string
+                            example: 'There is at least one error with the given JSON data, see other returned data for an example object with additional information'
+                          json_validation_errors:
+                            type: array
+                            minItems: 1
+                            items:
+                              type: object
+                              properties:
+                                json_validation_error:
+                                  type: string
+                                  example: I have a problem with the structure of the passed in JSON.
+                          example_object:
+                            title: ExampleObject
+                            type: object
+                            properties:
+                              object_property_1:
+                                type: string
+                                example: Required string property; Maximum Length = 30; Object description.
+                              object_property_2:
+                                type: string
+                                example: Required boolean property; Maximum Length = 0; Flag indicating something about the object.
+                              object_property_3:
+                                type: string
+                                example: Required string property; Minimum Length = 7; Maximum Length = 60; Primary email (XX@X.XX at minimum).
+    401UnauthorizedResponse:
+      description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
+      content:
+        application/json:
+          schema:
+            title: Unauthorized - Invalid/Missing Authorization GUID Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    type: string
+                    example: Invalid authorization GUID.
+    403ForbiddenResponse:
+      description: The API User does not have access to the requested resource.
+      content:
+        application/json:
+          schema:
+            title: Forbidden - Access Not Permitted Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                required:
+                  - error_state
+                  - error_msg
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    oneOf:
+                      - title: HandlerHttpErrorMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: The API handler indicated an error condition via the HTTP return code.
+                      - title: InvalidImpersonationGuidMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: Invalid Impersonation Guid
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        oneOf:
+                          - title: NoApiAccessMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the called method on the called resource.
+                          - title: AmsUserImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: User does not have access to the GET method on the dtc_orders API resource
+                          - title: DtcCustImpersonationFailureMessage
+                            x-tags:
+                              - Message
+                            type: string
+                            example: 'When impersonating a DTC customer, only actions on that customer are allowed'
+    404NotFoundResponse:
+      description: The requested API resource does not exist.
+      content:
+        application/json:
+          schema:
+            title: Not Found - Resource Does Not Exist Response
+            x-tags:
+              - FailureResponse
+            type: object
+            properties:
+              ams_api_response:
+                type: object
+                properties:
+                  error_state:
+                    type: boolean
+                    example: true
+                  error_msg:
+                    title: HandlerHttpErrorMessage
+                    x-tags:
+                      - Message
+                    type: string
+                    example: The API handler indicated an error condition via the HTTP return code.
+                  endpoint_response:
+                    type: object
+                    properties:
+                      error_msg:
+                        title: ResourceNotFoundMessage
+                        x-tags:
+                          - Message
+                        type: string
+                        example: API resource with provided ID not found.
