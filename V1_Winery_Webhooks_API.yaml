@@ -19,32 +19,32 @@ info:
   license:
     name: License Required
     url: 'http://www.amssoftware.com'
-  version: '2023-06-07'
+  version: '2023-06-20'
 servers:
   - description: Development Server
     url: 'https://thor2012-test.amscloudconnect.amssoftware.com/api'
 security:
   - AMSBearerAuth: []
 tags:
-  - name: WebhookGET
-    description: GETs to the API resource allow for information about webhooks to be retrieved.
-  - name: WebhookPOST
-    description: POSTs to the API resource allow for the creation of webhooks.
-  - name: WebhookPATCH
-    description: PATCHs to the API resource allow for the editing of webhooks.
   - name: WebhookDELETE
     description: DELETEs to the API resource allow for the deletion of webhooks.
+  - name: WebhookGET
+    description: GETs to the API resource allow for information about webhooks to be retrieved.
+  - name: WebhookPATCH
+    description: PATCHs to the API resource allow for the editing of webhooks.
+  - name: WebhookPOST
+    description: POSTs to the API resource allow for the creation of webhooks.
 paths:
   /winery/v1/webhook:
     get:
       operationId: getWineryWebhooks
       tags:
         - WebhookGET
-      summary: Gets client's webhooks.
+      summary: GET API client's webhooks.
       description: When a GET is issued to the webhook endpoint will provide information about currently defined web hooks for the current API client.
       responses:
         '200':
-          description: Ok - The query of the warehouse webhooks resource was successful.
+          description: Ok - The GET against the winery webhooks endpoint was successful.
           content:
             application/json:
               schema:
@@ -139,7 +139,7 @@ paths:
                                       maxLength: 8
                                       example: Active
         '400':
-          description: The query parameters used in the query of the webhook endpoint were invalid.
+          description: The query parameters used in the query of the winery webhook endpoint were invalid.
           content:
             application/json:
               schema:
@@ -322,8 +322,8 @@ paths:
       operationId: addWineryWebhook
       tags:
         - WebhookPOST
-      summary: Creates a webhook on a winery resource in the AMS database.
-      description: When a POST is issued to the webhook endpoint will create a webhook for the current API client with the information provided in the JSON body.
+      summary: POST a winery webhook.
+      description: 'When a POST is issued to the webhook endpoint, a webhook will be created on a winery resource in the AMS database for the current API client. The provided JSON body will contain information about the webhook being created.'
       requestBody:
         description: Request body for posting a winery webhook resource to the database. All components of the object are required to be present. Components with a non-zero minimum length require a value.
         required: true
@@ -365,7 +365,7 @@ paths:
                   example: Normal
       responses:
         '201':
-          description: Created - The provided webhook data was valid and a new webhook resource was created.
+          description: Created - The webhook data provided with the POST was valid and a new webhook resource was created.
           content:
             application/json:
               schema:
@@ -624,7 +624,7 @@ paths:
       operationId: getWineryWebhook
       tags:
         - WebhookGET
-      summary: Gets the webhook specified by the provided webhook_id.
+      summary: GET a specific winery webhook.
       description: 'When a GET is issued to the webhook endpoint with a webhook_id, the specific webhook is returned if it exists and belongs to the current API client'
       parameters:
         - name: webhook_id
@@ -635,7 +635,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Ok - The GET against a specific warehouse webhook resource was successful.
+          description: Ok - The GET against a specific winery webhook resource was successful.
           content:
             application/json:
               schema:
@@ -722,7 +722,7 @@ paths:
                                 maxLength: 8
                                 example: Active
         '400':
-          description: The query parameters used in the query of the webhook endpoint were invalid.
+          description: The query parameters used in the query of the winery webhook endpoint were invalid.
           content:
             application/json:
               schema:
@@ -905,8 +905,8 @@ paths:
       operationId: updateWineryWebhook
       tags:
         - WebhookPATCH
-      summary: Patches a specific winery webhook specified by the provided webhook_id
-      description: A PATCH to the webhook resource allows the editing of certain information about the webhook if it exists and belongs to the current API client.
+      summary: PATCH a specific winery webhook.
+      description: A PATCH to the webhook endpoint with a webhook_id allows the editing of certain information about the webhook if it exists and belongs to the current API client.
       parameters:
         - name: webhook_id
           in: path
@@ -951,7 +951,7 @@ paths:
                   example: Normal
       responses:
         '200':
-          description: OK - The provided webhook data was valid and the existing webhook resource was patched.
+          description: OK - The webhook data provided with the PATCH was valid and the existing webhook resource was patched.
           content:
             application/json:
               schema:
@@ -1209,8 +1209,8 @@ paths:
       operationId: deleteWineryWebhook
       tags:
         - WebhookDELETE
-      summary: Deletes a specific winery webhook specified by the provided webhook_id
-      description: A DELETE to the webhook resource removes the specified webhook from the API resource if it exists and belongs to the current API client.
+      summary: DELETE a winery webhook.
+      description: A DELETE to the webhook endpoint with a webhook_id removes the webhook from the API resource if it exists and belongs to the current API client.
       parameters:
         - name: webhook_id
           in: path
@@ -1220,7 +1220,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: Ok - The provided webhook_id was valid and the webhook resource was successfully deleted.
+          description: Ok - The DELETE to the winery webhooks endpoint with the provided webhook_id was valid and the webhook resource was successfully deleted.
         '401':
           description: The authorization GUID used in the request was invalid/expired or the authorization header itself was missing.
           content:
@@ -1327,11 +1327,11 @@ paths:
       operationId: getWineryWebhookTypes
       tags:
         - WebhookGET
-      summary: Gets the types of available winery webhooks.
-      description: When a GET is issued to the webhook/types endpoint will provide information about currently available winery webhooks.
+      summary: GET the types of available winery webhooks.
+      description: 'When a GET is issued to the webhook/types endpoint, information about currently available winery webhooks will be provided.'
       responses:
         '200':
-          description: Ok - The query of the warehouse webhook types was successful.
+          description: Ok - The GET against the winery webhook types was successful.
           content:
             application/json:
               schema:
@@ -1362,7 +1362,7 @@ paths:
                                       type: string
                                       example: warehouse/ship_customers
         '400':
-          description: The query parameters used in the query of the webhook endpoint were invalid.
+          description: The query parameters used in the query of the winery webhook endpoint were invalid.
           content:
             application/json:
               schema:
@@ -1546,10 +1546,10 @@ paths:
       operationId: renewWineryWebhook
       tags:
         - WebhookPATCH
-      summary: Renews the expiration date for a winery webhook.
-      description: A PATCH to the webhook/renew endpoint with a specific unique webhook ID will renew an expired webhook if it belongs to the current API client.
+      summary: PATCH the expiration date of a winery webhook.
+      description: A PATCH to the webhook/renew endpoint with a webhook_id and JSON body containing a valid expiration date value in the JSON body will renew an expired webhook if it belongs to the current API client.
       requestBody:
-        description: Request body for renewing a winery webhook resource in the database.
+        description: Request body for renewing a winery webhook resource in the database. The expiration date property is the only valid JSON component.
         required: true
         content:
           application/json:
@@ -1571,7 +1571,7 @@ paths:
             type: integer
       responses:
         '200':
-          description: OK - The provided webhook data was valid and the existing webhook resource was renewed.
+          description: OK - The webhook data provided with the PATCH was valid and the existing webhook resource was renewed.
           content:
             application/json:
               schema:
@@ -1914,7 +1914,7 @@ components:
                 maxLength: 6
                 example: Normal
     V1WebhookRenewPatchRequestBody:
-      description: Request body for renewing a winery webhook resource in the database.
+      description: Request body for renewing a winery webhook resource in the database. The expiration date property is the only valid JSON component.
       required: true
       content:
         application/json:
@@ -1929,7 +1929,7 @@ components:
                 example: 01/01/2023
   responses:
     200SuccessfulV1WebhooksGet:
-      description: Ok - The query of the warehouse webhooks resource was successful.
+      description: Ok - The GET against the winery webhooks endpoint was successful.
       content:
         application/json:
           schema:
@@ -2024,7 +2024,7 @@ components:
                                   maxLength: 8
                                   example: Active
     200SuccessfulV1WebhookGet:
-      description: Ok - The GET against a specific warehouse webhook resource was successful.
+      description: Ok - The GET against a specific winery webhook resource was successful.
       content:
         application/json:
           schema:
@@ -2111,7 +2111,7 @@ components:
                             maxLength: 8
                             example: Active
     200SuccessfulV1WebhookTypesGet:
-      description: Ok - The query of the warehouse webhook types was successful.
+      description: Ok - The GET against the winery webhook types was successful.
       content:
         application/json:
           schema:
@@ -2142,7 +2142,7 @@ components:
                                   type: string
                                   example: warehouse/ship_customers
     201SuccessfulV1WebhookPost:
-      description: Created - The provided webhook data was valid and a new webhook resource was created.
+      description: Created - The webhook data provided with the POST was valid and a new webhook resource was created.
       content:
         application/json:
           schema:
@@ -2229,7 +2229,7 @@ components:
                             maxLength: 8
                             example: Active
     200SuccessfulV1WebhookPatch:
-      description: OK - The provided webhook data was valid and the existing webhook resource was patched.
+      description: OK - The webhook data provided with the PATCH was valid and the existing webhook resource was patched.
       content:
         application/json:
           schema:
@@ -2316,9 +2316,9 @@ components:
                             maxLength: 8
                             example: Active
     200SuccessfulV1WebhookDelete:
-      description: Ok - The provided webhook_id was valid and the webhook resource was successfully deleted.
+      description: Ok - The DELETE to the winery webhooks endpoint with the provided webhook_id was valid and the webhook resource was successfully deleted.
     200SuccessfulV1WebhookRenew:
-      description: OK - The provided webhook data was valid and the existing webhook resource was renewed.
+      description: OK - The webhook data provided with the PATCH was valid and the existing webhook resource was renewed.
       content:
         application/json:
           schema:
@@ -2405,7 +2405,7 @@ components:
                             maxLength: 8
                             example: Active
     400BadParmsGetResponse:
-      description: The query parameters used in the query of the webhook endpoint were invalid.
+      description: The query parameters used in the query of the winery webhook endpoint were invalid.
       content:
         application/json:
           schema:
