@@ -97,15 +97,6 @@ paths:
                                       maxLength: 10
                                       minLength: 10
                                       example: 01/01/2023
-                                    notification_on_add:
-                                      type: boolean
-                                      example: true
-                                    notification_on_change:
-                                      type: boolean
-                                      example: true
-                                    notification_on_delete:
-                                      type: boolean
-                                      example: true
                                     revised_date:
                                       type: string
                                       maxLength: 10
@@ -410,15 +401,6 @@ paths:
                                 maxLength: 10
                                 minLength: 10
                                 example: 01/01/2023
-                              notification_on_add:
-                                type: boolean
-                                example: true
-                              notification_on_change:
-                                type: boolean
-                                example: true
-                              notification_on_delete:
-                                type: boolean
-                                example: true
                               revised_date:
                                 type: string
                                 maxLength: 10
@@ -680,15 +662,6 @@ paths:
                                 maxLength: 10
                                 minLength: 10
                                 example: 01/01/2023
-                              notification_on_add:
-                                type: boolean
-                                example: true
-                              notification_on_change:
-                                type: boolean
-                                example: true
-                              notification_on_delete:
-                                type: boolean
-                                example: true
                               revised_date:
                                 type: string
                                 maxLength: 10
@@ -996,15 +969,6 @@ paths:
                                 maxLength: 10
                                 minLength: 10
                                 example: 01/01/2023
-                              notification_on_add:
-                                type: boolean
-                                example: true
-                              notification_on_change:
-                                type: boolean
-                                example: true
-                              notification_on_delete:
-                                type: boolean
-                                example: true
                               revised_date:
                                 type: string
                                 maxLength: 10
@@ -1616,15 +1580,6 @@ paths:
                                 maxLength: 10
                                 minLength: 10
                                 example: 01/01/2023
-                              notification_on_add:
-                                type: boolean
-                                example: true
-                              notification_on_change:
-                                type: boolean
-                                example: true
-                              notification_on_delete:
-                                type: boolean
-                                example: true
                               revised_date:
                                 type: string
                                 maxLength: 10
@@ -1989,15 +1944,6 @@ components:
                                   maxLength: 10
                                   minLength: 10
                                   example: 01/01/2023
-                                notification_on_add:
-                                  type: boolean
-                                  example: true
-                                notification_on_change:
-                                  type: boolean
-                                  example: true
-                                notification_on_delete:
-                                  type: boolean
-                                  example: true
                                 revised_date:
                                   type: string
                                   maxLength: 10
@@ -2076,15 +2022,6 @@ components:
                             maxLength: 10
                             minLength: 10
                             example: 01/01/2023
-                          notification_on_add:
-                            type: boolean
-                            example: true
-                          notification_on_change:
-                            type: boolean
-                            example: true
-                          notification_on_delete:
-                            type: boolean
-                            example: true
                           revised_date:
                             type: string
                             maxLength: 10
@@ -2194,15 +2131,6 @@ components:
                             maxLength: 10
                             minLength: 10
                             example: 01/01/2023
-                          notification_on_add:
-                            type: boolean
-                            example: true
-                          notification_on_change:
-                            type: boolean
-                            example: true
-                          notification_on_delete:
-                            type: boolean
-                            example: true
                           revised_date:
                             type: string
                             maxLength: 10
@@ -2281,15 +2209,6 @@ components:
                             maxLength: 10
                             minLength: 10
                             example: 01/01/2023
-                          notification_on_add:
-                            type: boolean
-                            example: true
-                          notification_on_change:
-                            type: boolean
-                            example: true
-                          notification_on_delete:
-                            type: boolean
-                            example: true
                           revised_date:
                             type: string
                             maxLength: 10
@@ -2370,15 +2289,6 @@ components:
                             maxLength: 10
                             minLength: 10
                             example: 01/01/2023
-                          notification_on_add:
-                            type: boolean
-                            example: true
-                          notification_on_change:
-                            type: boolean
-                            example: true
-                          notification_on_delete:
-                            type: boolean
-                            example: true
                           revised_date:
                             type: string
                             maxLength: 10
