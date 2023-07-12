@@ -42,6 +42,13 @@ paths:
         - WebhookGET
       summary: GET API client's webhooks.
       description: When a GET is issued to the webhook endpoint will provide information about currently defined web hooks for the current API client.
+      parameters:
+        - name: pagination
+          in: query
+          description: This query parameter allows for pagination of query results.
+          required: false
+          schema:
+            type: string
       responses:
         '200':
           description: Ok - The GET against the winery webhooks endpoint was successful.
@@ -1831,6 +1838,13 @@ components:
       type: http
       scheme: bearer
   parameters:
+    PaginationQueryParm:
+      name: pagination
+      in: query
+      description: This query parameter allows for pagination of query results.
+      required: false
+      schema:
+        type: string
     WebhookIdParm:
       name: webhook_id
       in: path
