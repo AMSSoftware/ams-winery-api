@@ -340,15 +340,6 @@ paths:
                   maxLength: 10
                   minLength: 10
                   example: 01/01/2023
-                notification_on_add:
-                  type: boolean
-                  example: true
-                notification_on_change:
-                  type: boolean
-                  example: true
-                notification_on_delete:
-                  type: boolean
-                  example: true
                 webhook_priority:
                   title: WebhookPriorityEnum
                   x-tags:
@@ -908,15 +899,6 @@ paths:
                   maxLength: 10
                   minLength: 10
                   example: 01/01/2023
-                notification_on_add:
-                  type: boolean
-                  example: true
-                notification_on_change:
-                  type: boolean
-                  example: true
-                notification_on_delete:
-                  type: boolean
-                  example: true
                 webhook_priority:
                   title: WebhookPriorityEnum
                   x-tags:
@@ -1826,15 +1808,6 @@ components:
                 maxLength: 10
                 minLength: 10
                 example: 01/01/2023
-              notification_on_add:
-                type: boolean
-                example: true
-              notification_on_change:
-                type: boolean
-                example: true
-              notification_on_delete:
-                type: boolean
-                example: true
               webhook_priority:
                 title: WebhookPriorityEnum
                 x-tags:
@@ -1861,15 +1834,6 @@ components:
                 maxLength: 10
                 minLength: 10
                 example: 01/01/2023
-              notification_on_add:
-                type: boolean
-                example: true
-              notification_on_change:
-                type: boolean
-                example: true
-              notification_on_delete:
-                type: boolean
-                example: true
               webhook_priority:
                 title: WebhookPriorityEnum
                 x-tags:
