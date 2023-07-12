@@ -49,6 +49,22 @@ paths:
           required: false
           schema:
             type: string
+        - name: status
+          in: query
+          description: This query parameter allows for filtering the query results by webhook status.
+          required: false
+          schema:
+            title: WebhookStatusEnum
+            x-tags:
+              - Enumeration
+              - Webhook
+            type: string
+            enum:
+              - Active
+              - Expired
+              - Canceled
+            maxLength: 8
+            example: Active
       responses:
         '200':
           description: Ok - The GET against the winery webhooks endpoint was successful.
@@ -1782,6 +1798,23 @@ components:
       required: false
       schema:
         type: string
+    WebhookStatusQueryParm:
+      name: status
+      in: query
+      description: This query parameter allows for filtering the query results by webhook status.
+      required: false
+      schema:
+        title: WebhookStatusEnum
+        x-tags:
+          - Enumeration
+          - Webhook
+        type: string
+        enum:
+          - Active
+          - Expired
+          - Canceled
+        maxLength: 8
+        example: Active
     WebhookIdParm:
       name: webhook_id
       in: path
