@@ -126,7 +126,7 @@ paths:
                                     webhook_id:
                                       type: integer
                                       minimum: 1
-                                      maximum: 999999999
+                                      maximum: 999999999999
                                       example: 1234
                                     webhook_priority:
                                       title: WebhookPriorityEnum
@@ -421,7 +421,7 @@ paths:
                               webhook_id:
                                 type: integer
                                 minimum: 1
-                                maximum: 999999999
+                                maximum: 999999999999
                                 example: 1234
                               webhook_priority:
                                 title: WebhookPriorityEnum
@@ -682,7 +682,7 @@ paths:
                               webhook_id:
                                 type: integer
                                 minimum: 1
-                                maximum: 999999999
+                                maximum: 999999999999
                                 example: 1234
                               webhook_priority:
                                 title: WebhookPriorityEnum
@@ -980,7 +980,7 @@ paths:
                               webhook_id:
                                 type: integer
                                 minimum: 1
-                                maximum: 999999999
+                                maximum: 999999999999
                                 example: 1234
                               webhook_priority:
                                 title: WebhookPriorityEnum
@@ -1591,7 +1591,7 @@ paths:
                               webhook_id:
                                 type: integer
                                 minimum: 1
-                                maximum: 999999999
+                                maximum: 999999999999
                                 example: 1234
                               webhook_priority:
                                 title: WebhookPriorityEnum
@@ -1954,7 +1954,7 @@ components:
                                 webhook_id:
                                   type: integer
                                   minimum: 1
-                                  maximum: 999999999
+                                  maximum: 999999999999
                                   example: 1234
                                 webhook_priority:
                                   title: WebhookPriorityEnum
@@ -2032,7 +2032,7 @@ components:
                           webhook_id:
                             type: integer
                             minimum: 1
-                            maximum: 999999999
+                            maximum: 999999999999
                             example: 1234
                           webhook_priority:
                             title: WebhookPriorityEnum
@@ -2141,7 +2141,7 @@ components:
                           webhook_id:
                             type: integer
                             minimum: 1
-                            maximum: 999999999
+                            maximum: 999999999999
                             example: 1234
                           webhook_priority:
                             title: WebhookPriorityEnum
@@ -2219,7 +2219,7 @@ components:
                           webhook_id:
                             type: integer
                             minimum: 1
-                            maximum: 999999999
+                            maximum: 999999999999
                             example: 1234
                           webhook_priority:
                             title: WebhookPriorityEnum
@@ -2299,7 +2299,7 @@ components:
                           webhook_id:
                             type: integer
                             minimum: 1
-                            maximum: 999999999
+                            maximum: 999999999999
                             example: 1234
                           webhook_priority:
                             title: WebhookPriorityEnum
