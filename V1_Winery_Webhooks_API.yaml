@@ -350,19 +350,23 @@ paths:
             schema:
               title: V1PostWebhookObject
               type: object
+              required:
+                - webhook_endpoint_url
+                - callback_url
               properties:
                 webhook_endpoint_url:
                   type: string
+                  minLength: 12
                   maxLength: 64
                   example: warehouse/v1/orders/1234-0
                 callback_url:
                   type: string
+                  minLength: 12
                   maxLength: 1024
                   example: 'https://www.callbackhere.com/hook_receiver'
                 expiration_date:
                   type: string
                   maxLength: 10
-                  minLength: 10
                   example: 01/01/2023
                 webhook_priority:
                   title: WebhookPriorityEnum
@@ -1859,19 +1863,23 @@ components:
           schema:
             title: V1PostWebhookObject
             type: object
+            required:
+              - webhook_endpoint_url
+              - callback_url
             properties:
               webhook_endpoint_url:
                 type: string
+                minLength: 12
                 maxLength: 64
                 example: warehouse/v1/orders/1234-0
               callback_url:
                 type: string
+                minLength: 12
                 maxLength: 1024
                 example: 'https://www.callbackhere.com/hook_receiver'
               expiration_date:
                 type: string
                 maxLength: 10
-                minLength: 10
                 example: 01/01/2023
               webhook_priority:
                 title: WebhookPriorityEnum
