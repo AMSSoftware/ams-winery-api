@@ -94,10 +94,14 @@ paths:
                                   title: V1GETWebhookObject
                                   type: object
                                   properties:
-                                    api_resource_endpoint:
+                                    webhook_endpoint_url:
                                       type: string
                                       maxLength: 64
                                       example: warehouse/v1/orders/1234-0
+                                    callback_url:
+                                      type: string
+                                      maxLength: 1024
+                                      example: 'https://www.callbackhere.com/hook_receiver'
                                     creation_date:
                                       type: string
                                       maxLength: 10
@@ -347,10 +351,14 @@ paths:
               title: V1PostWebhookObject
               type: object
               properties:
-                api_resource_endpoint:
+                webhook_endpoint_url:
                   type: string
                   maxLength: 64
                   example: warehouse/v1/orders/1234-0
+                callback_url:
+                  type: string
+                  maxLength: 1024
+                  example: 'https://www.callbackhere.com/hook_receiver'
                 expiration_date:
                   type: string
                   maxLength: 10
@@ -389,10 +397,14 @@ paths:
                             title: V1GETWebhookObject
                             type: object
                             properties:
-                              api_resource_endpoint:
+                              webhook_endpoint_url:
                                 type: string
                                 maxLength: 64
                                 example: warehouse/v1/orders/1234-0
+                              callback_url:
+                                type: string
+                                maxLength: 1024
+                                example: 'https://www.callbackhere.com/hook_receiver'
                               creation_date:
                                 type: string
                                 maxLength: 10
@@ -650,10 +662,14 @@ paths:
                             title: V1GETWebhookObject
                             type: object
                             properties:
-                              api_resource_endpoint:
+                              webhook_endpoint_url:
                                 type: string
                                 maxLength: 64
                                 example: warehouse/v1/orders/1234-0
+                              callback_url:
+                                type: string
+                                maxLength: 1024
+                                example: 'https://www.callbackhere.com/hook_receiver'
                               creation_date:
                                 type: string
                                 maxLength: 10
@@ -910,6 +926,10 @@ paths:
               title: V1PATCHWebhookObject
               type: object
               properties:
+                callback_url:
+                  type: string
+                  maxLength: 1024
+                  example: 'https://www.callbackhere.com/hook_receiver'
                 expiration_date:
                   type: string
                   maxLength: 10
@@ -948,10 +968,14 @@ paths:
                             title: V1GETWebhookObject
                             type: object
                             properties:
-                              api_resource_endpoint:
+                              webhook_endpoint_url:
                                 type: string
                                 maxLength: 64
                                 example: warehouse/v1/orders/1234-0
+                              callback_url:
+                                type: string
+                                maxLength: 1024
+                                example: 'https://www.callbackhere.com/hook_receiver'
                               creation_date:
                                 type: string
                                 maxLength: 10
@@ -1327,7 +1351,7 @@ paths:
                                   title: V1GETWebhookType
                                   type: object
                                   properties:
-                                    webhook_type:
+                                    webhook_endpoint_url:
                                       type: string
                                       example: warehouse/ship_customers
         '400':
@@ -1559,10 +1583,14 @@ paths:
                             title: V1GETWebhookObject
                             type: object
                             properties:
-                              api_resource_endpoint:
+                              webhook_endpoint_url:
                                 type: string
                                 maxLength: 64
                                 example: warehouse/v1/orders/1234-0
+                              callback_url:
+                                type: string
+                                maxLength: 1024
+                                example: 'https://www.callbackhere.com/hook_receiver'
                               creation_date:
                                 type: string
                                 maxLength: 10
@@ -1832,10 +1860,14 @@ components:
             title: V1PostWebhookObject
             type: object
             properties:
-              api_resource_endpoint:
+              webhook_endpoint_url:
                 type: string
                 maxLength: 64
                 example: warehouse/v1/orders/1234-0
+              callback_url:
+                type: string
+                maxLength: 1024
+                example: 'https://www.callbackhere.com/hook_receiver'
               expiration_date:
                 type: string
                 maxLength: 10
@@ -1862,6 +1894,10 @@ components:
             title: V1PATCHWebhookObject
             type: object
             properties:
+              callback_url:
+                type: string
+                maxLength: 1024
+                example: 'https://www.callbackhere.com/hook_receiver'
               expiration_date:
                 type: string
                 maxLength: 10
@@ -1922,10 +1958,14 @@ components:
                               title: V1GETWebhookObject
                               type: object
                               properties:
-                                api_resource_endpoint:
+                                webhook_endpoint_url:
                                   type: string
                                   maxLength: 64
                                   example: warehouse/v1/orders/1234-0
+                                callback_url:
+                                  type: string
+                                  maxLength: 1024
+                                  example: 'https://www.callbackhere.com/hook_receiver'
                                 creation_date:
                                   type: string
                                   maxLength: 10
@@ -2000,10 +2040,14 @@ components:
                         title: V1GETWebhookObject
                         type: object
                         properties:
-                          api_resource_endpoint:
+                          webhook_endpoint_url:
                             type: string
                             maxLength: 64
                             example: warehouse/v1/orders/1234-0
+                          callback_url:
+                            type: string
+                            maxLength: 1024
+                            example: 'https://www.callbackhere.com/hook_receiver'
                           creation_date:
                             type: string
                             maxLength: 10
@@ -2086,7 +2130,7 @@ components:
                               title: V1GETWebhookType
                               type: object
                               properties:
-                                webhook_type:
+                                webhook_endpoint_url:
                                   type: string
                                   example: warehouse/ship_customers
     201SuccessfulV1WebhookPost:
@@ -2109,10 +2153,14 @@ components:
                         title: V1GETWebhookObject
                         type: object
                         properties:
-                          api_resource_endpoint:
+                          webhook_endpoint_url:
                             type: string
                             maxLength: 64
                             example: warehouse/v1/orders/1234-0
+                          callback_url:
+                            type: string
+                            maxLength: 1024
+                            example: 'https://www.callbackhere.com/hook_receiver'
                           creation_date:
                             type: string
                             maxLength: 10
@@ -2187,10 +2235,14 @@ components:
                         title: V1GETWebhookObject
                         type: object
                         properties:
-                          api_resource_endpoint:
+                          webhook_endpoint_url:
                             type: string
                             maxLength: 64
                             example: warehouse/v1/orders/1234-0
+                          callback_url:
+                            type: string
+                            maxLength: 1024
+                            example: 'https://www.callbackhere.com/hook_receiver'
                           creation_date:
                             type: string
                             maxLength: 10
@@ -2267,10 +2319,14 @@ components:
                         title: V1GETWebhookObject
                         type: object
                         properties:
-                          api_resource_endpoint:
+                          webhook_endpoint_url:
                             type: string
                             maxLength: 64
                             example: warehouse/v1/orders/1234-0
+                          callback_url:
+                            type: string
+                            maxLength: 1024
+                            example: 'https://www.callbackhere.com/hook_receiver'
                           creation_date:
                             type: string
                             maxLength: 10
